@@ -70,13 +70,6 @@ Substitution ciphers
 
    :param key: an integer, ideally between 0 and 26.
 
-   .. method:: encrypt(text, strip=False)
-
-      Because the Caesar cipher only operates on alphabetic character,
-      non-alphabetic characters show up in the ciphertext unmolested, which
-      will make cryptanalysis even easier. If this is undesirable, set the
-      :data:`strip` parameter to :const:`True`.
-
 .. class:: Rot13()
 
    ROT13 is a special case of the :class:`Caesar` cipher. In effect, it is the
