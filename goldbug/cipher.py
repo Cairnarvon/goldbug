@@ -7,6 +7,8 @@ these should considered broken; they are provided for educational and historical
 purposes, not security.
 """
 
+import string
+
 class Cipher(object):
     """
     Base class for all ciphers. Don't instantiate this.
@@ -20,7 +22,28 @@ class Cipher(object):
 
 # Substitution ciphers
 
-class Atbash(Cipher):
+class MonoalphabeticSubstitutionCipher(Cipher):
+    """
+    Abstract base class for ciphers that use monoalphabetic substitutions.
+    """
+    def encrypt(self, text):
+        """
+        Encrypts the given text. Plaintext case will be preserved in the
+        ciphertext, to the extent that this makes sense.
+        """
+        return ''.join((type(text).lower, type(text).upper)[c.isupper()]\
+                       (self.encrypt_mapping.get(c.lower(), c)) for c in text)
+
+    def decrypt(self, text):
+        """
+        Decrypts the given text. Ciphertext case will be preserved in the
+        plaintext, to the extent that this makes sense.
+        """
+        return ''.join((type(text).lower, type(text).upper)[c.isupper()]\
+                       (self.decrypt_mapping.get(c.lower(), c)) for c in text)
+
+
+class Atbash(MonoalphabeticSubstitutionCipher):
     """
     Atbash is a keyless substitution cipher, originally for the Hebrew
     alphabet. It consists of substituting the first letter of the alphabet for
@@ -35,21 +58,10 @@ class Atbash(Cipher):
         alphabet is the alphabet to use, in the right order.
         """
         self.alphabet = alphabet.lower()
-        self.mapping = dict(zip(self.alphabet, self.alphabet[::-1]))
+        self.encrypt_mapping = dict(zip(self.alphabet, self.alphabet[::-1]))
+        self.decrypt_mapping = self.encrypt_mapping
 
-    def encrypt(self, text, strip=False):
-        """
-        Encrypts the given text. Plaintext case will be preserved in the
-        ciphertext, to the extent that this makes sense.
-        """
-        if strip:
-            text = filter(lambda c: c.lower() in self.alphabet, text)
-        return ''.join((type(text).lower, type(text).upper)[c.isupper()]\
-                       (self.mapping.get(c.lower(), c)) for c in text)
-
-    decrypt = encrypt
-
-class Caesar(Cipher):
+class Caesar(MonoalphabeticSubstitutionCipher):
     """
     The Caesar cipher, also known as the shift cipher or Caesar shift, is a
     monoalphabetic substitution cipher in which each letter of the alphabet is
@@ -64,31 +76,10 @@ class Caesar(Cipher):
         key should be an integer, practically between 0 and 26.
         """
         self.key = int(key) % 26
-
-    def encrypt(self, text, strip=False):
-        """
-        Encrypts the given text.
-        
-        If strip is True, non-alphabetic characters (including spaces) are
-        removed before encryption; otherwise, they are preserved and will be
-        in the ciphertext unmolested.
-        """
-        if strip:
-            text = filter(str.isalpha, text)
-        return ''.join(self.__shift(c, self.key) for c in text)
-
-    def decrypt(self, text):
-        """
-        Decrypts the given text.
-        """
-        return ''.join(self.__shift(c, 26 - self.key) for c in text)
-
-    def __shift(self, c, key):
-        if 'a' <= c <= 'z':
-            return chr(ord('a') + (ord(c) - ord('a') + key) % 26)
-        if 'A' <= c <= 'Z':
-            return chr(ord('A') + (ord(c) - ord('A') + key) % 26)
-        return c
+        shifted = [chr(ord('a') + (ord(c) - ord('a') + key) % 26) for c in
+                   string.ascii_lowercase]
+        self.encrypt_mapping = dict(zip(string.ascii_lowercase, shifted))
+        self.decrypt_mapping = dict(zip(shifted, string.ascii_lowercase))
 
 class Rot13(Caesar):
     """
@@ -100,4 +91,4 @@ class Rot13(Caesar):
     obscure spoilers and punchlines to jokes.
     """
     def __init__(self):
-        self.key = 13
+        super(Rot13, self).__init__(13)
