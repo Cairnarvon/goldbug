@@ -81,6 +81,27 @@ class Caesar(MonoalphabeticSubstitutionCipher):
         self.encrypt_mapping = dict(zip(string.ascii_lowercase, shifted))
         self.decrypt_mapping = dict(zip(shifted, string.ascii_lowercase))
 
+class Keyword(MonoalphabeticSubstitutionCipher):
+    """
+    The keyword cipher is a monoalphabetic substitution cipher using a keyword
+    as the key. The alphabet is appended to the key, and duplicate letters are
+    removed. The result is then aligned with the plaintext alphabet to obtain
+    the substitution mapping.
+
+    For example, with the key "SECRET":
+
+    Plaintext:  A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+    Ciphertext: S E C R T A B D F G H I J K L M N O P Q U V W X Y Z
+    """
+    def __init__(self, key):
+        self.key = key.lower()
+        m = []
+        for c in key + string.ascii_lowercase:
+            if c not in m:
+                m.append(c)
+        self.encrypt_mapping = dict(zip(string.ascii_lowercase, m))
+        self.decrypt_mapping = dict(zip(m, string.ascii_lowercase))
+
 class Rot13(Caesar):
     """
     ROT13 is a special case of the Caesar cipher. In effect, it is the Caesar

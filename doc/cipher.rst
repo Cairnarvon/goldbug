@@ -51,8 +51,6 @@ Substitution ciphers
       >>> cipher.encrypt("לב קמי")
       'כש דימ'
 
-   Case will be preserved to the extent possible.
-
    If you're using Python 2.x, remember to pass :class:`unicode` objects if
    your alphabet isn't ASCII.
 
@@ -70,6 +68,25 @@ Substitution ciphers
 
    :param key: an integer, ideally between 0 and 26.
 
+.. class:: Keyword(key)
+
+   The keyword cipher is a monoalphabetic substitution cipher using a keyword
+   as the key. The alphabet is appended to the key, and duplicate letters are
+   removed. The result is then aligned with the plaintext alphabet to obtain
+   the substitution mapping.
+
+   For example, with the key ``SECRET``:
+
+   +----------------+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+   |                | ↓ |                                                                                                   |
+   +================+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+
+   | **Plaintext**  | A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q | R | S | T | U | V | W | X | Y | Z |
+   +----------------+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+   | **Ciphertext** | S | E | C | R | T | A | B | D | F | G | H | I | J | K | L | M | N | O | P | Q | U | V | W | X | Y | Z |
+   +----------------+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+   :param key: a short string.
+
 .. class:: Rot13()
 
    ROT13 is a special case of the :class:`Caesar` cipher. In effect, it is the
@@ -78,4 +95,3 @@ Substitution ciphers
 
    It became particularly popular on Usenet, where it was often used to obscure
    spoilers and punchlines to jokes.
-
