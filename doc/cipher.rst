@@ -35,6 +35,29 @@ pattern.
 Substitution ciphers
 --------------------
 
+.. class:: Atbash(alphabet="abcdefghijklmnopqrstuvwxyz")
+
+   Arbash is a kerless substitution cipher, originally for the Hebrew alphabet.
+   It consists of substituting the first letter of the alphabet for the last,
+   the second for the penultimate, and so on; hence the name (אתבש). It is a
+   reciprocal cipher, meaning two successive applications will yield the
+   original plaintext.
+
+   This implementation works on the 26-letter alphabet by default. It's
+   possible to make it use other alphabets.
+
+      >>> import goldbug
+      >>> cipher = goldbug.cipher.Atbash("אבגדהוזחטיכלמנסעפצקרשת")
+      >>> cipher.encrypt("לב קמי")
+      'כש דימ'
+
+   Case will be preserved to the extent possible.
+
+   If you're using Python 2.x, remember to pass :class:`unicode` objects if
+   your alphabet isn't ASCII.
+
+   :param alphabet: the ordered alphabet to use.
+
 .. class:: Caesar(key)
 
    The Caesar cipher, also known as the shift cipher or Caesar shift, is a
@@ -47,7 +70,7 @@ Substitution ciphers
 
    :param key: an integer, ideally between 0 and 26.
 
-   .. method:: encrypt(text, strip=True)
+   .. method:: encrypt(text, strip=False)
 
       Because the Caesar cipher only operates on alphabetic character,
       non-alphabetic characters show up in the ciphertext unmolested, which

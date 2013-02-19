@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding=utf8
 
 """
 This module implements a number of classical cryptographic algorithms. All of
@@ -18,6 +19,35 @@ class Cipher(object):
 
 
 # Substitution ciphers
+
+class Atbash(Cipher):
+    """
+    Atbash is a keyless substitution cipher, originally for the Hebrew
+    alphabet. It consists of substituting the first letter of the alphabet for
+    the last, the second for the penultimate, and so on; hence the name (אתבש).
+    It is a reciprocal cipher, meaning two successive applications will yield
+    the original plaintext.
+
+    This implementation works on the 26-letter Latin alphabet by default.
+    """
+    def __init__(self, alphabet="abcdefghijklmnopqrstuvwxyz"):
+        """
+        alphabet is the alphabet to use, in the right order.
+        """
+        self.alphabet = alphabet.lower()
+        self.mapping = dict(zip(self.alphabet, self.alphabet[::-1]))
+
+    def encrypt(self, text, strip=False):
+        """
+        Encrypts the given text. Plaintext case will be preserved in the
+        ciphertext, to the extent that this makes sense.
+        """
+        if strip:
+            text = filter(lambda c: c.lower() in self.alphabet, text)
+        return ''.join((type(text).lower, type(text).upper)[c.isupper()]\
+                       (self.mapping.get(c.lower(), c)) for c in text)
+
+    decrypt = encrypt
 
 class Caesar(Cipher):
     """
