@@ -8,6 +8,6 @@ pre-computing era) ciphers, as well as various tools to study and help break
 them.
 """
 
-import cipher
-import util
-import freq
+from . import cipher
+from . import util
+from . import freq

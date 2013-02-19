@@ -9,4 +9,4 @@ and bigram, with each key representing an n-gram and each value being its
 frequency, as a number between 0 and 1.
 """
 
-import english
+from . import english
