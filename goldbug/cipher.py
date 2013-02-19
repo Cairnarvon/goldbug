@@ -75,13 +75,13 @@ class Caesar(Cipher):
         """
         if strip:
             text = filter(str.isalpha, text)
-        return ''.join(map(lambda c: self.__shift(c, self.key), text))
+        return ''.join(self.__shift(c, self.key) for c in text)
 
     def decrypt(self, text):
         """
         Decrypts the given text.
         """
-        return ''.join(map(lambda c: self.__shift(c, 26 - self.key), text))
+        return ''.join(self.__shift(c, 26 - self.key) for c in text)
 
     def __shift(self, c, key):
         if 'a' <= c <= 'z':
