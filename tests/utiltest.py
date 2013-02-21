@@ -26,6 +26,10 @@ class FreqAnalTest(unittest.TestCase):
         self.assertEqual(goldbug.util.frequency_analysis("mississipi", 11),
                          {})
 
+class Chi2Test(unittest.TestCase):
+    def test_chi2(self):
+        self.assertEqual(goldbug.util.chi2('aaa', {'a': 1}), 0.0)
+        self.assertEqual(goldbug.util.chi2('aaa', {'a': 0}), float('inf'))
 
 if __name__ == '__main__':
     unittest.main()
