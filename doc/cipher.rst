@@ -95,3 +95,39 @@ Substitution ciphers
 
    It became particularly popular on Usenet, where it was often used to obscure
    spoilers and punchlines to jokes.
+
+
+Miscellaneous
+-------------
+
+These things aren't ciphers in themselves, but are used by them.
+
+.. class:: Polybius(key, alphabet='abcdefghiklmnopqrstuvwxyz')
+
+   This is a representation of a Polybius square, also known as the Polybius
+   checkerboard.
+
+   The Polybius square maps an alphabet onto a checkboard, possibly with the
+   help of a key. It isn't particularly useful on its own, but it's used
+   by several classical ciphers.
+
+   This class provides a :class:`dict`-like mapping from characters to (row,
+   column) tuples and vice versa. It converts to a string nicely:
+
+    >>> from goldbug.cipher import Polybius
+    >>> kana = 'いろはにほへとちりぬるをわかよたれそつねならむうゐのおくやまけふこえてあさきゆめみしゑひもせすん。'
+    >>> uesugi = Polybius('', kana)
+    >>> print(uesugi)
+    い ろ は に ほ へ と
+    ち り ぬ る を わ か
+    よ た れ そ つ ね な
+    ら む う ゐ の お く
+    や ま け ふ こ え て
+    あ さ き ゆ め み し
+    ゑ ひ も せ す ん 。
+
+   If you're using Python 2.x, remember to pass :class:`unicode` objects if
+   your key and alphabet aren't ASCII.
+
+   :param key: a string, each character of which must appear in the alphabet.
+   :param alphabet: a string of a length with an integral square root.

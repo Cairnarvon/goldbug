@@ -8,6 +8,45 @@ sys.path.append('..')
 
 import goldbug
 
+class PolybiusTest(unittest.TestCase):
+    def test_polybius(self):
+        p = goldbug.cipher.Polybius('')
+        self.assertEqual(p[(0, 0)], 'a')
+        self.assertEqual(p[(0, 1)], 'b')
+        self.assertEqual(p[(1, 0)], 'f')
+        self.assertEqual(p[(4, 4)], 'z')
+
+        self.assertEqual(p['a'], (0, 0))
+        self.assertEqual(p['b'], (0, 1))
+        self.assertEqual(p['f'], (1, 0))
+        self.assertEqual(p['z'], (4, 4))
+
+        p = goldbug.cipher.Polybius('keyword')
+        self.assertEqual(p[(0, 0)], 'k')
+        self.assertEqual(p['e'], (0, 1))
+
+        p = goldbug.cipher.Polybius('', 'abcd')
+        self.assertEqual(p[(0, 0)], 'a')
+        self.assertEqual(p[(0, 1)], 'b')
+        self.assertEqual(p['c'], (1, 0))
+        self.assertEqual(p['d'], (1, 1))
+
+    def test_polybius_str(self):
+        p = goldbug.cipher.Polybius('', 'abcd')
+        self.assertEqual(str(p), 'a b\nc d')
+
+        p = goldbug.cipher.Polybius('d', 'd')
+        self.assertEqual(str(p), 'd')
+
+    def test_polybius_bad(self):
+        self.assertRaises(ValueError, goldbug.cipher.Polybius, '', 'ab')
+        self.assertRaises(ValueError, goldbug.cipher.Polybius, '.')
+        self.assertRaises(ValueError, goldbug.cipher.Polybius, '', 'abcc')
+
+        p = goldbug.cipher.Polybius('key')
+        self.assertRaises(KeyError, p.__getitem__, '!')
+        self.assertRaises(KeyError, p.__getitem__, (6, 6))
+
 class AtbashTest(unittest.TestCase):
     def test_atbash_encryption(self):
         cipher = goldbug.cipher.Atbash()
