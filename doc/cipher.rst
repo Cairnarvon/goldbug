@@ -87,6 +87,39 @@ Substitution ciphers
 
    :param key: a short string.
 
+.. class:: Playfair(key, breaker='x', padding='z', omitted={'j': 'i'})
+
+   The Playfair is a monoalphabetic digraph substitution cipher invented by
+   Charles Wheatstone in 1854 and popularised by Lord Playfair.
+
+   It uses a :class:`Polybius` square with a key to map digraphs (that is,
+   groups of two letters) to other digraphs in the following way:
+
+   #. If the two letters are the same, insert an `x` (the :const:`breaker`
+      parameter) between them and encrypt the new initial digraph.
+   #. If the two letters form the opposite corners of a rectangle, they are
+      replaced with the other two corners. Each character is replaced with the
+      other corner on the same row.
+   #. Otherwise, if the two letters are in the same row, they are replaced with
+      the letters to the immediate right of them (wrapping around to the other
+      side if needed).
+   #. Otherwise, if the two letters are in the same column, they are replaced
+      with the letters immediately below them (wrapping around to the other
+      side if needed.)
+
+   If necessary, the plaintext is padded with a `z` (the :const:`padding`
+   parameter) to ensure it is of even length.
+
+   Because a :class:`Polybius` square only has room for 25 letters, one letter
+   must be discarded; this is the :const:`omitted` parameter. By default,
+   occurences of the letter `j` in the plaintext are mapped to `i`. Another
+   common option is to discard the letter `q` entirely (`{'q': ''}`).
+
+   :param key: a string.
+   :param breaker: a single letter.
+   :param padding: a single letter.
+   :param omitted: a :class:`dict` mapping a letter to a letter or :const:`''`.
+
 .. class:: Rot13()
 
    ROT13 is a special case of the :class:`Caesar` cipher. In effect, it is the

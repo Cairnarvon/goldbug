@@ -146,6 +146,49 @@ class KeywordTest(unittest.TestCase):
         cipher = goldbug.cipher.Keyword('.#;@')
         self.assertEqual(cipher.encrypt('ddbabcbc'), '@@#.#;#;')
 
+class PlayfairTest(unittest.TestCase):
+    def test_playfair_encryption(self):
+        cipher = goldbug.cipher.Playfair('playfair example')
+        self.assertEqual(cipher.encrypt('Hide the gold in the tree stump'),
+                         'bmodzbxdnabekudmuixmmouvif')
+
+    def test_playfair_decryption(self):
+        cipher = goldbug.cipher.Playfair('playfair example')
+        self.assertEqual(cipher.decrypt('bmodzbxdnabekudmuixmmouvif'),
+                         'hidethegoldinthetrexestump')
+
+    def test_playfair_token(self):
+        tokenise = lambda c, s: ''.join(a + b for (a, b)
+                                        in c._Playfair__plain_pairs(s))
+
+        cipher = goldbug.cipher.Playfair('')
+        self.assertEqual(tokenise(cipher, ''), '')
+        self.assertEqual(tokenise(cipher, 'e'), 'ez')
+        self.assertEqual(tokenise(cipher, 'ee'), 'exez')
+        self.assertEqual(tokenise(cipher, 'eee'), 'exexez')
+        self.assertEqual(tokenise(cipher, 'test'), 'test')
+        self.assertEqual(tokenise(cipher, 'tqjt'), 'tqit')
+        self.assertEqual(tokenise(cipher, 'xxxxx'), 'xz')
+
+        cipher = goldbug.cipher.Playfair('', omitted={'q': ''},
+                                         breaker='a', padding='b')
+        self.assertEqual(tokenise(cipher, 'e'), 'eb')
+        self.assertEqual(tokenise(cipher, 'ee'), 'eaeb')
+        self.assertEqual(tokenise(cipher, 'test'), 'test')
+        self.assertEqual(tokenise(cipher, 'tqjt'), 'tjtb')
+
+        self.assertRaises(ValueError, list,
+                          cipher._Playfair__cipher_pairs('y'))
+
+    def test_playfair_bad(self):
+        self.assertRaises(ValueError, goldbug.cipher.Playfair, '', breaker='.')
+        self.assertRaises(ValueError, goldbug.cipher.Playfair, '', padding='.')
+        self.assertRaises(ValueError, goldbug.cipher.Playfair, '', omitted='.')
+        self.assertRaises(ValueError, goldbug.cipher.Playfair, '',
+                          omitted={'.': 'a'})
+        self.assertRaises(ValueError, goldbug.cipher.Playfair, '',
+                          omitted={'a': '.'})
+
 class Rot13Test(unittest.TestCase):
     def test_rot13_encryption(self):
         cipher = goldbug.cipher.Rot13()

@@ -9,6 +9,12 @@ purposes, not security.
 
 import string
 
+try:
+    from itertools import izip
+except ImportError:
+    izip = zip
+
+
 class Cipher(object):
     """
     Base class for all ciphers. Don't instantiate this.
@@ -143,6 +149,127 @@ class Keyword(MonoalphabeticSubstitutionCipher):
                 m.append(c)
         self.encrypt_mapping = dict(zip(string.ascii_lowercase, m))
         self.decrypt_mapping = dict(zip(m, string.ascii_lowercase))
+
+class Playfair(MonoalphabeticSubstitutionCipher):
+    """
+    The Playfair cipher is a digraph substitution cipher invented by Charles
+    Wheatstone in 1854 and popularised by Lord Playfair.
+    """
+    def __init__(self, key, breaker='x', padding='z', omitted={'j': 'i'}):
+        """
+        key is a short string.
+        breaker is the letter with which duplicate pairs are broken up.
+        omitted is a mapping. ({'q': ''} is common).
+        """
+        # Ensure omitted is proper and lowercase.
+        if not isinstance(omitted, dict):
+            raise ValueError('omitted must be a dict!')
+        self.omitted = dict((k.lower(), v.lower()) for k, v in omitted.items())
+
+        # Adjust the alphabet to take omitted into account.
+        self.alphabet = ''.join(c for c in string.ascii_lowercase
+                                if c not in self.omitted)
+        if len(self.alphabet) != 25 or \
+           any(len(c) > 1 or c not in self.alphabet
+               for c in self.omitted.values()):
+            raise ValueError('Malformed omitted!')
+
+        # Ensure the breaker is alright.
+        self.breaker = breaker
+        if len(breaker) != 1 or breaker not in self.alphabet:
+            raise ValueError('Breaker %s not in alphabet!' % breaker)
+
+        # Ensure the padding is alright.
+        self.padding = padding
+        if len(padding) != 1 or padding not in self.alphabet:
+            raise ValueError('Padding %s not in alphabet!' % padding)
+
+        # Clean the key.
+        self.key = key
+        key = ''.join(c for c in key.lower() if c in self.alphabet)
+
+        # Construct the Polybius square.
+        self.polybius = Polybius(key, self.alphabet)
+
+    # Playfair is a monoalphabetic substitution cipher, but because it
+    # works with bigrams rather than individual letters, we can't reuse
+    # MonoalphabeticSubstitutionCipher's methods.
+
+    def encrypt(self, text):
+        """
+        Turn provided plaintext into ciphertext.
+        """
+        return ''.join(self.__polyb(b) for b in self.__plain_pairs(text))
+
+    def decrypt(self, text):
+        """
+        Turn provided ciphertext into plaintext.
+        """
+        return ''.join(self.__polyb(b, True) for b in self.__cipher_pairs(text))
+
+    def __plain_pairs(self, text):
+        """
+        Turns plaintext into proper digraphs (tuples) for encryption.
+        """
+        # Convert mappings.
+        text = ''.join(self.omitted.get(c, c) for c in text)
+
+        # Get rid of repeated breaker characters.
+        while self.breaker + self.breaker in text:
+            text = text.replace(self.breaker + self.breaker, self.breaker)
+
+        # Pad.
+        text += self.padding
+
+        plain = (c for c in text.lower() if c in self.alphabet)
+        for a, b in izip(plain, plain):
+            if a == b:
+                yield a, self.breaker
+                c = next(plain)
+                while c == b:
+                    yield b, self.breaker
+                    c = next(plain)
+                yield b, c
+            else:
+                yield a, b
+
+    def __cipher_pairs(self, text):
+        """
+        Turns ciphertext into proper digraphs (tuples) for decryption.
+        Will raise ValueError is ciphertext is bogus.
+        """
+        if len(text) % 2 != 0:
+            raise ValueError('Ciphertext of uneven length!')
+        cipher = (self.omitted.get(c, c) for c in text)
+        for a, b in zip(cipher, cipher):
+            if a == b:
+                raise ValueError('Invalid ciphertext!')
+            yield a, b
+
+    def __polyb(self, digraph, decrypt=False):
+        """
+        Translates a digraph through the Polybius square.
+        """
+        r1, c1 = self.polybius[digraph[0]]
+        r2, c2 = self.polybius[digraph[1]]
+
+        if r1 != r2 and c1 != c2:
+            return self.polybius[(r1, c2)] + self.polybius[(r2, c1)]
+        elif r1 == r2:
+            if decrypt:
+                c1 = (c1 - 1) % 5
+                c2 = (c2 - 1) % 5
+            else:
+                c1 = (c1 + 1) % 5
+                c2 = (c2 + 1) % 5
+        elif c1 == c2:
+            if decrypt:
+                r1 = (r1 - 1) % 5
+                r2 = (r2 - 1) % 5
+            else:
+                r1 = (r1 + 1) % 5
+                r2 = (r2 + 1) % 5
+        return self.polybius[(r1, c1)] + self.polybius[(r2, c2)]
 
 class Rot13(Caesar):
     """
