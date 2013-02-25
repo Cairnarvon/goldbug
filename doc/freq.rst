@@ -10,7 +10,7 @@
 This package contains n-gram frequency tables for natural languages, which may
 be of use in cryptanalysis.
 
-Each language module contains at least two dictionaries: :data:`monogram` and
+Each language module contains at least two dictionaries: :data:`unigram` and
 :data:`bigram`, with each key representing an n-gram and each value being its
 frequency, as a number between 0 and 1.
 

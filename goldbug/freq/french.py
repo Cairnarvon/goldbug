@@ -10,7 +10,7 @@ http://practicalcryptography.com/
 
 from __future__ import unicode_literals
 
-monogram = {
+unigram = {
     'e': 0.14474054,
     's': 0.07978894,
     'a': 0.07604415,

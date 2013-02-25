@@ -17,12 +17,12 @@ classical ciphers provided by :mod:`goldbug.cipher`.
    through brute force:
 
       >>> import goldbug
-      >>> from goldbug.freq.english import monogram
+      >>> from goldbug.freq.english import unigram
       >>> ciphertext = 'sjsfmhvwbuksgsscfgssawgpihorfsoakwhvwborfsoa'
       >>> candidates = {}
       >>> for i in range(26):
       ...     plaintext = goldbug.cipher.Caesar(i).decrypt(ciphertext)
-      ...     candidates[plaintext] = goldbug.util.chi2(plaintext, monogram)
+      ...     candidates[plaintext] = goldbug.util.chi2(plaintext, unigram)
       ...
       >>> for candidate in sorted(candidates, key=candidates.__getitem__):
       ...    print('%8.2f %s' % (candidates[candidate], candidate))

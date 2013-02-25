@@ -23,7 +23,7 @@ def chi2(text, freqs):
     Performs Pearson's chi-squared test on a potential plaintext with respect
     to a given frequency table. Lower numbers are better.
     freqs should be a table from goldbug.freq.*; for instance, to perform the
-    test with respect to English monograms, use goldbug.freq.english.monogram.
+    test with respect to English unigrams, use goldbug.freq.english.unigram.
     """
     acc = 0
     for c in freqs:

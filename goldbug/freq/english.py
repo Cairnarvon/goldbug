@@ -7,7 +7,7 @@ These tables were derived from data provided by James Lyons of
 http://practicalcryptography.com/
 """
 
-monogram = {
+unigram = {
     'e': 0.12096522,
     't': 0.08938126,
     'a': 0.08551690,
