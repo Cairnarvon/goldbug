@@ -35,6 +35,29 @@ pattern.
 Substitution ciphers
 --------------------
 
+.. class:: Affine(key, alphabet="abcdefghijklmnopqrstuvwxyz")
+
+   The affine cipher is a monoalphabetic substitution cipher that maps each
+   letter of the alphabet to another one through a simple mathematical function.
+   Its key consists of two integers, *a* and *b*, the first of which must be
+   prime relative to the length of the alphabet.
+
+   To encrypt a letter, it is first transformed into a number (A becomes 0, B
+   becomes 1, etc.), which is then multiplied by *a* and incremented by *b*,
+   modulo the length of the alphabet. The resulting number is then turned back
+   into a letter.
+
+   The decryption step is the same in reverse: the number is decremented by *b*
+   and multiplied by *a*'s multiplicative inverse modulo the length of the
+   alphabet (see :func:`goldbug.util.mmi`).
+
+   The reason *a* must be prime relative to the length of the alphabet is that
+   the modular multiplicative inverse only exists if that is the case.
+
+   :param key: a tuple of two integers, the first of which is prime relative to
+               the length of the alphabet.
+   :param alphabet: the alphabet.
+
 .. class:: Atbash(alphabet="abcdefghijklmnopqrstuvwxyz")
 
    Arbash is a kerless substitution cipher, originally for the Hebrew alphabet.

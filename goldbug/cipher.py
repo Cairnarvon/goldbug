@@ -15,6 +15,9 @@ except ImportError:
     izip = zip
 
 
+from . import util
+
+
 class Cipher(object):
     """
     Base class for all ciphers. Don't instantiate this.
@@ -93,6 +96,49 @@ class MonoalphabeticSubstitutionCipher(Cipher):
         return ''.join((type(text).lower, type(text).upper)[c.isupper()]\
                        (self.decrypt_mapping.get(c.lower(), c)) for c in text)
 
+
+class Affine(MonoalphabeticSubstitutionCipher):
+    """
+    The affine cipher is a monoalphabetic substitution cipher that maps each
+    letter of the alphabet to another one through a simple mathematical
+    function. Its key consists of two integers, a and b, the first of which
+    must be prime relative to the length of the alphabet.
+
+    To encrypt a letter, it is transformed into a number (A becomes 0, B
+    becomes 1, etc.), which is multiplied by a and incremented by b modulo the
+    length of the alphabet. The resulting number is turned back into a letter.
+
+    The decryption step is the same in reverse: the number is decremented by b
+    and multiplied by a's multiplicative inverse modulo the length of the
+    alphabet.
+    """
+    def __init__(self, key, alphabet='abcdefghijklmnopqrstuvwxyz'):
+        """
+        key is a tuple of integers, the first of which must be prime relative
+        to the length of the alphabet.
+        """
+        self.alphabet = alphabet.lower()
+        self.key = key
+        a, b = key
+
+        # Decryption mapping.
+        # Doing this one first so we don't have to waste time if a doesn't
+        # have a multiplicative inverse modulo len(alphabet).
+        mmi = util.mmi(a, len(alphabet))
+        self.decrypt_mapping = dict(
+            (c, alphabet[mmi * (alphabet.index(c) - b) % len(alphabet)])
+            for c in alphabet
+        )
+
+        # Encryption mapping.
+        self.encrypt_mapping = dict(
+            (c, alphabet[(a * alphabet.index(c) + b) % len(alphabet)])
+            for c in alphabet
+        )
+
+    def __repr__(self):
+        return '%s(%r, alphabet=%r)' % (self.__class__.__name__,
+                                        self.key, self.alphabet)
 
 class Atbash(MonoalphabeticSubstitutionCipher):
     """

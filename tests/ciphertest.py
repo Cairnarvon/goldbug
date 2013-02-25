@@ -47,6 +47,40 @@ class PolybiusTest(unittest.TestCase):
         self.assertRaises(KeyError, p.__getitem__, '!')
         self.assertRaises(KeyError, p.__getitem__, (6, 6))
 
+class AffineTest(unittest.TestCase):
+    def test_affine_encryption(self):
+        cipher = goldbug.cipher.Affine((5, 7))
+        self.assertEqual(cipher.encrypt('Defend the east wall of the castle'),
+                         'Wbgbuw yqb bhty nhkk zg yqb rhtykb')
+
+        cipher = goldbug.cipher.Affine((1, 0))
+        self.assertEqual(cipher.encrypt('Something something.'),
+                         'Something something.')
+
+        cipher = goldbug.cipher.Affine((3, 1), 'abCde')
+        self.assertEqual(cipher.encrypt('Adbaes'), 'Baebds')
+
+    def test_affine_decryption(self):
+        cipher = goldbug.cipher.Affine((5, 7))
+        self.assertEqual(cipher.decrypt('Wbgbuw yqb bhty nhkk zg yqb rhtykb'),
+                         'Defend the east wall of the castle')
+
+        cipher = goldbug.cipher.Affine((1, 0))
+        self.assertEqual(cipher.decrypt('Something something.'),
+                         'Something something.')
+
+        cipher = goldbug.cipher.Affine((3, 1), 'abCde')
+        self.assertEqual(cipher.decrypt('Baebds'), 'Adbaes')
+
+    def test_affine_bad(self):
+        self.assertRaises(ValueError, goldbug.cipher.Affine, (2, 4))
+
+    def test_affine_misc(self):
+        self.assertEqual(repr(goldbug.cipher.Affine((5, 7))),
+                         "Affine((5, 7), alphabet='abcdefghijklmnopqrstuvwxyz')")
+        self.assertEqual(repr(goldbug.cipher.Affine((3, 1), 'abCde')),
+                         "Affine((3, 1), alphabet='abcde')")
+
 class AtbashTest(unittest.TestCase):
     def test_atbash_encryption(self):
         cipher = goldbug.cipher.Atbash()
