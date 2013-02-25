@@ -36,3 +36,25 @@ def chi2(text, freqs):
         else:
             acc += (c_i - e_i)**2 / e_i
     return acc
+
+def egcd(a, b):
+    """
+    Extended Euclidean algorithm.
+    Returns (g, x, y) such that ax + by = g = gcd(a, b).
+    """
+    x, y, u, v = 0, 1, 1, 0
+    while a != 0:
+        q, r = b // a, b % a
+        m, n = x - u * q, y - v * q
+        b, a, x, y, u, v = a, r, u, v, m, n
+    return b, x, y
+
+def mmi(a, m):
+    """
+    Calculates the multiplicative inverse of a modulo m, or raises a
+    ValueError if a is not prime relative to m.
+    """
+    g, x, y = egcd(a, m)
+    if g != 1:
+        raise ValueError('%d is not prime relative to %d!' % (a, m))
+    return x % m

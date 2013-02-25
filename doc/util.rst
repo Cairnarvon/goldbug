@@ -7,6 +7,10 @@
 Eventually this module will contain utilities for studying and breaking the
 classical ciphers provided by :mod:`goldbug.cipher`.
 
+
+Text characterisation
+---------------------
+
 .. function:: chi2(text, freqs)
 
    Performs Pearson's chi-squared test on a potential plaintext with respect to
@@ -70,3 +74,17 @@ classical ciphers provided by :mod:`goldbug.cipher`.
        >>> goldbug.util.frequency_analysis('mississipi', 2)
        {'ss': 0.25, 'ip': 0.125, 'is': 0.25, 'mi': 0.125, 'si': 0.25}
 
+
+Other utilities
+---------------
+
+.. function:: egcd(a, b)
+
+   This function implements the extended Euclidean algorithm. It returns a tuple
+   *(g, x, y)* such that :math:`ax + by = g = gcd(a, b)`.
+
+.. function:: mmi(a, m)
+
+   This function computes the multiplicative inverse of *a* modulo *m*,
+   raising a :class:`ValueError` if *a* is not prime relative to *m* (and
+   the multiplicative inverse therefore doesn't exist).

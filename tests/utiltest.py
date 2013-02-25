@@ -31,5 +31,16 @@ class Chi2Test(unittest.TestCase):
         self.assertEqual(goldbug.util.chi2('aaa', {'a': 1}), 0.0)
         self.assertEqual(goldbug.util.chi2('aaa', {'a': 0}), float('inf'))
 
+class MMITest(unittest.TestCase):
+    def test_egcd(self):
+        self.assertEqual(goldbug.util.egcd(120, 23), (1, -9, 47))
+        self.assertEqual(goldbug.util.egcd(81, 57), (3, -7, 10))
+
+    def test_mmi(self):
+        self.assertEqual(goldbug.util.mmi(1, 1), 0)
+        self.assertEqual(goldbug.util.mmi(5, 26), 21)
+
+        self.assertRaises(ValueError, goldbug.util.mmi, 2, 4)
+
 if __name__ == '__main__':
     unittest.main()
