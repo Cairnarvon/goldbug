@@ -35,6 +35,14 @@ pattern.
 Substitution ciphers
 --------------------
 
+Substitution ciphers replace units of plaintext with units of ciphertext. They
+may be **monoalphabetic**, in which case substitions are fixed and depend only
+on the element itself and the key, or **polyalphabetic**, in which case other
+factors, such as the position of the element in the text, will be at play as
+well. If the elements on which the cipher acts are individual characters, it is
+a **simple** substitution cipher; if it operates on groups of characters, it is
+**polygraphic**.
+
 .. class:: Affine(key, alphabet="abcdefghijklmnopqrstuvwxyz")
 
    The affine cipher is a monoalphabetic substitution cipher that maps each
@@ -60,7 +68,7 @@ Substitution ciphers
 
 .. class:: Atbash(alphabet="abcdefghijklmnopqrstuvwxyz")
 
-   Arbash is a kerless substitution cipher, originally for the Hebrew alphabet.
+   Arbash is a keyless substitution cipher, originally for the Hebrew alphabet.
    It consists of substituting the first letter of the alphabet for the last,
    the second for the penultimate, and so on; hence the name (אתבש). It is a
    reciprocal cipher, meaning two successive applications will yield the
@@ -155,6 +163,10 @@ Substitution ciphers
 
 Transposition ciphers
 ---------------------
+
+Transposition ciphers produce ciphertext by permuting plaintext---that is,
+transposing its elements. Elements on which the ciphers work may be individual
+characters or groups of them.
 
 .. class:: Column(key, pad='x')
 
