@@ -130,6 +130,54 @@ Substitution ciphers
    spoilers and punchlines to jokes.
 
 
+Transposition ciphers
+---------------------
+
+.. class:: Column(key, pad='x')
+
+   The columnar transposition cipher is a fairly straightforward transposition
+   cipher, which permutes plaintext in two steps.
+
+   First, the plaintext is padded until its length is a multiple of the key
+   length and placed into columns below the key, as follows:
+
+   +---+---+---+---+---+---+
+   | C | I | P | H | E | R |
+   +===+===+===+===+===+===+
+   | t | h | i | s | i | s |
+   +---+---+---+---+---+---+
+   | a | n | e | x | a | m |
+   +---+---+---+---+---+---+
+   | p | l | e | x | x | x |
+   +---+---+---+---+---+---+
+
+   In this example, the plaintext is ``thisisanexample``, the key is ``CIPHER``,
+   and the padding character is ``x``.
+
+   In the second step, the columns are moved so that the key's characters are
+   in alphabetical order:
+
+   +---+---+---+---+---+---+
+   | C | E | H | I | P | R |
+   +===+===+===+===+===+===+
+   | t | i | s | h | i | s |
+   +---+---+---+---+---+---+
+   | a | a | x | n | e | m |
+   +---+---+---+---+---+---+
+   | p | x | x | l | e | x |
+   +---+---+---+---+---+---+
+
+   Then the key row is removed, and the columns are catenated to form the
+   ciphertext; in this case, ``tapiaxsxxhnlieesmx``.
+
+   By itself, the columnar transposition cipher is fairly easy to break, but
+   it continued to be used as part of more complex encryption schemes until
+   some time into the 1950s.
+
+   :param key: a short string with no repeated characters.
+   :param pad: a single character used for padding.
+
+
 Miscellaneous
 -------------
 

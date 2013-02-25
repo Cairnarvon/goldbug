@@ -201,5 +201,39 @@ class Rot13Test(unittest.TestCase):
         self.assertEqual(cipher.encrypt('test'), cipher.decrypt('test'))
         self.assertEqual(cipher.encrypt(cipher.encrypt('test')), 'test')
 
+class Column(unittest.TestCase):
+    def test_column_encryption(self):
+        cipher = goldbug.cipher.Column('german')
+        self.assertEqual(cipher.encrypt('defendtheeastwallofthecastle'),
+                         'nalcxehwttdttfseeleedsoaxfeahl')
+
+        cipher = goldbug.cipher.Column('cipher', 'y')
+        self.assertEqual(cipher.encrypt('thisisanexample'),
+                         'tapiaysxyhnlieesmy')
+
+        cipher = goldbug.cipher.Column('x')
+        self.assertEqual(cipher.encrypt('something'), 'something')
+
+    def test_column_decryption(self):
+        cipher = goldbug.cipher.Column('german')
+        self.assertEqual(cipher.decrypt('nalcxehwttdttfseeleedsoaxfeahl'),
+                         'defendtheeastwallofthecastle')
+
+        cipher = goldbug.cipher.Column('cipher', 'y')
+        self.assertEqual(cipher.decrypt('tapiaysxyhnlieesmy'),
+                         'thisisanexample')
+
+        cipher = goldbug.cipher.Column('y')
+        self.assertEqual(cipher.decrypt('y'), 'y')
+
+    def test_column_bad(self):
+        self.assertRaises(ValueError, goldbug.cipher.Column, '')
+        self.assertRaises(ValueError, goldbug.cipher.Column, 'aa')
+        self.assertRaises(ValueError, goldbug.cipher.Column, 'abc', '')
+        self.assertRaises(ValueError, goldbug.cipher.Column, 'abc', 'xy')
+
+        cipher = goldbug.cipher.Column('abc')
+        self.assertRaises(ValueError, cipher.decrypt, 'abcd')
+
 if __name__ == '__main__':
     unittest.main()

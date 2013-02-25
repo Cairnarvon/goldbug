@@ -282,3 +282,88 @@ class Rot13(Caesar):
     """
     def __init__(self):
         super(Rot13, self).__init__(13)
+
+
+# Transposition ciphers
+
+class Column(Cipher):
+    """
+    The columnar transposition cipher is a fairly straightforward transposition
+    cipher, which permutes plaintext in two steps.
+
+    First, the plaintext is padded until its length is a multiple of the key
+    length and placed into columns below the key, as follows:
+
+        C I P H E R
+        t h i s i s
+        a n e x a m
+        p l e x x x
+
+    In this example, the plaintext is "thisisanexample", the key is "CIPHER",
+    and the padding character is "x".
+
+    In the second step, the columns are moved so that the key's characters are
+    in alphabetical order:
+
+        C E H I P R
+        t i s h i s
+        a a x n e m
+        p x x l e x
+
+    Then the key row is removed, and the columns are catenated to form the
+    ciphertext; in this case, "tapiaxsxxhnlieesmx".
+
+    By itself, the columnar transposition cipher is fairly easy to break, but
+    it continued to be used as part of more complex encryption schemes until
+    some time into the 1950s.
+    """
+    def __init__(self, key, pad='x'):
+        """
+        key is a short string with no repeated characters.
+        pad is a single character.
+        """
+        if len(key) < 1:
+            raise ValueError('Invalid key!')
+        for c in key:
+            if key.count(c) > 1:
+                raise ValueError('Each key character must be unique!')
+        self.key = key
+
+        if len(pad) != 1:
+            raise ValueError('pad must be one character!')
+        self.pad = pad
+
+    def encrypt(self, text):
+        """
+        Encrypts the provided plaintext.
+        """
+        # Pad the plaintext until it's rectangular.
+        if len(text) % len(self.key):
+            text += self.pad * (len(self.key) - len(text) % len(self.key))
+
+        # Assemble the columns.
+        columns = [text[i::len(self.key)] for i in range(len(self.key))]
+
+        # Index them by ciphertext character and sort alphabetically.
+        columns = dict((k, v) for k, v in zip(self.key, columns))
+        return ''.join(columns[k] for k in sorted(self.key))
+
+    def decrypt(self, text):
+        """
+        Decrypts the provided ciphertext.
+        """
+        if len(text) % len(self.key) != 0:
+            raise ValueError('Not a valid ciphertext.')
+        rows = len(text) // len(self.key)
+
+        # Break the ciphertext up in columns.
+        columns = [text[i * rows:(i + 1) * rows] for i in range(len(self.key))]
+
+        # Index the columns by their key character.
+        columns = dict((k, c) for k, c in zip(sorted(self.key), columns))
+
+        # Restore their original order.
+        columns = [columns[c] for c in self.key]
+
+        # Just read off the plaintext.
+        return ''.join(''.join(row) for row in zip(*columns)).rstrip(self.pad)
