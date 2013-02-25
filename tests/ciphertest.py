@@ -67,6 +67,12 @@ class AtbashTest(unittest.TestCase):
         self.assertEqual(cipher.encrypt('test'), cipher.decrypt('test'))
         self.assertEqual(cipher.encrypt(cipher.encrypt('test')), 'test')
 
+    def test_atbash_misc(self):
+        self.assertEqual(repr(goldbug.cipher.Atbash()),
+                         "Atbash(alphabet='abcdefghijklmnopqrstuvwxyz')")
+        self.assertEqual(repr(goldbug.cipher.Atbash('abc')),
+                         "Atbash(alphabet='abc')")
+
 class CaesarTest(unittest.TestCase):
     def test_caesar_encryption(self):
         cipher = goldbug.cipher.Caesar(3)
@@ -107,6 +113,9 @@ class CaesarTest(unittest.TestCase):
 
         self.assertRaises(ValueError, goldbug.cipher.Caesar, 'notakey')
 
+    def test_caesar_misc(self):
+        self.assertEquals(repr(goldbug.cipher.Caesar(4)), 'Caesar(4)')
+
 class KeywordTest(unittest.TestCase):
     def test_keyword_encryption(self):
         cipher = goldbug.cipher.Keyword('kryptos')
@@ -145,6 +154,9 @@ class KeywordTest(unittest.TestCase):
     def test_keyword_badkeys(self):
         cipher = goldbug.cipher.Keyword('.#;@')
         self.assertEqual(cipher.encrypt('ddbabcbc'), '@@#.#;#;')
+
+    def test_keyword_misc(self):
+        self.assertEqual(repr(goldbug.cipher.Keyword('abc')), "Keyword('abc')")
 
 class PlayfairTest(unittest.TestCase):
     def test_playfair_encryption(self):
@@ -189,6 +201,16 @@ class PlayfairTest(unittest.TestCase):
         self.assertRaises(ValueError, goldbug.cipher.Playfair, '',
                           omitted={'a': '.'})
 
+    def test_playfair_misc(self):
+        self.assertEqual(
+            repr(goldbug.cipher.Playfair('a')),
+            "Playfair('a', breaker='x', padding='z', omitted={'j': 'i'})"
+        )
+        self.assertEqual(
+            repr(goldbug.cipher.Playfair('a', 'a', 'a', {'q': ''})),
+            "Playfair('a', breaker='a', padding='a', omitted={'q': ''})"
+        )
+
 class Rot13Test(unittest.TestCase):
     def test_rot13_encryption(self):
         cipher = goldbug.cipher.Rot13()
@@ -200,6 +222,9 @@ class Rot13Test(unittest.TestCase):
         cipher = goldbug.cipher.Rot13()
         self.assertEqual(cipher.encrypt('test'), cipher.decrypt('test'))
         self.assertEqual(cipher.encrypt(cipher.encrypt('test')), 'test')
+
+    def test_rot13_misc(self):
+        self.assertEqual(repr(goldbug.cipher.Rot13()), 'Rot13()')
 
 class Column(unittest.TestCase):
     def test_column_encryption(self):
@@ -234,6 +259,12 @@ class Column(unittest.TestCase):
 
         cipher = goldbug.cipher.Column('abc')
         self.assertRaises(ValueError, cipher.decrypt, 'abcd')
+
+    def test_column_misc(self):
+        self.assertEqual(repr(goldbug.cipher.Column('cipher')),
+                         "Column('cipher', pad='x')")
+        self.assertEqual(repr(goldbug.cipher.Column('german', 'q')),
+                         "Column('german', pad='q')")
 
 if __name__ == '__main__':
     unittest.main()

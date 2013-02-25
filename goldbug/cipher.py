@@ -25,6 +25,9 @@ class Cipher(object):
     def decrypt(self, text):
         raise NotImplementedError
 
+    def __repr__(self):
+        return '%s(%r)' % (self.__class__.__name__, self.key)
+
 class Polybius(dict):
     """
     A representation of a Polybius square.
@@ -108,6 +111,9 @@ class Atbash(MonoalphabeticSubstitutionCipher):
         self.alphabet = alphabet.lower()
         self.encrypt_mapping = dict(zip(self.alphabet, self.alphabet[::-1]))
         self.decrypt_mapping = self.encrypt_mapping
+
+    def __repr__(self):
+        return '%s(alphabet=%r)' % (self.__class__.__name__, self.alphabet)
 
 class Caesar(MonoalphabeticSubstitutionCipher):
     """
@@ -271,6 +277,11 @@ class Playfair(MonoalphabeticSubstitutionCipher):
                 r2 = (r2 + 1) % 5
         return self.polybius[(r1, c1)] + self.polybius[(r2, c2)]
 
+    def __repr__(self):
+        return '%s(%r, breaker=%r, padding=%r, omitted=%r)' % \
+               (self.__class__.__name__, self.key, self.breaker, self.padding,
+                self.omitted)
+
 class Rot13(Caesar):
     """
     ROT13 is a special case of the Caesar cipher. In effect, it is the Caesar
@@ -282,6 +293,9 @@ class Rot13(Caesar):
     """
     def __init__(self):
         super(Rot13, self).__init__(13)
+
+    def __repr__(self):
+        return '%s()' % self.__class__.__name__
 
 
 # Transposition ciphers
@@ -367,3 +381,6 @@ class Column(Cipher):
 
         # Just read off the plaintext.
         return ''.join(''.join(row) for row in zip(*columns)).rstrip(self.pad)
+
+    def __repr__(self):
+        return '%s(%r, pad=%r)' % (self.__class__.__name__, self.key, self.pad)
