@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 import goldbug
 
+
 class PolybiusTest(unittest.TestCase):
     def test_polybius(self):
         p = goldbug.cipher.Polybius('')
@@ -47,6 +48,9 @@ class PolybiusTest(unittest.TestCase):
         p = goldbug.cipher.Polybius('key')
         self.assertRaises(KeyError, p.__getitem__, '!')
         self.assertRaises(KeyError, p.__getitem__, (6, 6))
+
+
+# Substitution ciphers
 
 class AffineTest(unittest.TestCase):
     def test_affine_encryption(self):
@@ -282,7 +286,10 @@ class SimpleTest(unittest.TestCase):
         self.assertEqual(repr(goldbug.cipher.Simple({'a': '!'})),
                          "Simple({'a': '!'})")
 
-class Column(unittest.TestCase):
+
+# Transposition ciphers.
+
+class ColumnTest(unittest.TestCase):
     def test_column_encryption(self):
         cipher = goldbug.cipher.Column('german')
         self.assertEqual(cipher.encrypt('defendtheeastwallofthecastle'),
@@ -321,6 +328,9 @@ class Column(unittest.TestCase):
                          "Column('cipher', pad='x')")
         self.assertEqual(repr(goldbug.cipher.Column('german', 'q')),
                          "Column('german', pad='q')")
+
+
+# Other ciphers.
 
 class BifidTest(unittest.TestCase):
     def test_bifid_encrypt(self):
