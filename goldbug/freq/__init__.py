@@ -10,3 +10,5 @@ frequency, as a number between 0 and 1.
 """
 
 from . import english
+
+__all__ = ['english', 'french', 'german']
