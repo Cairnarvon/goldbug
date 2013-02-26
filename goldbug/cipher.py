@@ -343,6 +343,18 @@ class Rot13(Caesar):
     def __repr__(self):
         return '%s()' % self.__class__.__name__
 
+class Simple(MonoalphabeticSubstitutionCipher):
+    """
+    The simplest substitution cipher just maps characters to other characters.
+    """
+    def __init__(self, key):
+        """
+        key: a dict mapping characters to other characters.
+        """
+        self.key = dict(key)
+        self.encrypt_mapping = self.key
+        self.decrypt_mapping = dict((b, a) for (a, b) in self.key.items())
+
 
 # Transposition ciphers
 

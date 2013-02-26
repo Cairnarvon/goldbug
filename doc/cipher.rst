@@ -160,6 +160,38 @@ a **simple** substitution cipher; if it operates on groups of characters, it is
    It became particularly popular on Usenet, where it was often used to obscure
    spoilers and punchlines to jokes.
 
+.. class:: Simple(key)
+
+   The most straightforward substitution cipher: a simple, monoalphabetic cipher
+   that takes a mapping from characters to other characters as its key.
+
+   You can use this to recreate Poe's Gold-Bug cipher, after which
+   :mod:`goldbug` was named:
+
+      >>> cipher = goldbug.cipher.Simple({'a': '5', 'b': '2', 'c': '—', 'd': '†',
+      ...                                 'e': '8', 'f': '1', 'g': '3', 'h': '4',
+      ...                                 'i': '6', 'l': '0', 'm': '9', 'n': '*',
+      ...                                 'o': '‡', 'p': '.', 'r': '(', 's': ')',
+      ...                                 't': ';', 'u': '?', 'v': '¶', 'y': ':'})
+      >>> print(cipher.decrypt('''\
+      ... 53‡‡†305))6*;4826)4‡.)4‡);806*;48†8
+      ... ¶60))85;1‡(;:‡*8†83(88)5*†;46(;88*96
+      ... *?;8)*‡(;485);5*†2:*‡(;4956*2(5*—4)8
+      ... ¶8*;4069285);)6†8)4‡‡;1(‡9;48081;8:8‡
+      ... 1;48†85;4)485†528806*81(‡9;48;(88;4
+      ... (‡?34;48)4‡;161;:188;‡?;'''))
+      agoodglassinthebishopshostelinthede
+      vilsseatfortyonedegreesandthirteenmi
+      nutesnortheastandbynorthmainbranchse
+      venthlimbeastsideshootfromthelefteyeo
+      fthedeathsheadabeelinefromthetreeth
+      roughtheshotfiftyfeetout
+
+   If you're using Python 2.x, remember to pass :class:`unicode` objects if
+   your alphabet isn't ASCII.
+
+   :param key: a :class:`dict` mapping characters to characters.
+
 
 Transposition ciphers
 ---------------------

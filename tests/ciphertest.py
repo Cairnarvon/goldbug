@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import string
 import sys
 import unittest
 
@@ -259,6 +260,27 @@ class Rot13Test(unittest.TestCase):
 
     def test_rot13_misc(self):
         self.assertEqual(repr(goldbug.cipher.Rot13()), 'Rot13()')
+
+class SimpleTest(unittest.TestCase):
+    def test_simple_encryption(self):
+        cipher = goldbug.cipher.Simple(dict(zip(string.ascii_lowercase,
+                                                'sxbveqiagnuorpdfmcyhltzjkw')))
+        self.assertEqual(cipher.encrypt('zyxwvutsrqponmlkjihgfedcba'),
+                         'wkjztlhycmfdproungaiqevbxs')
+
+    def test_simple_decryption(self):
+        cipher = goldbug.cipher.Simple(dict(zip(string.ascii_lowercase,
+                                                'sxbveqiagnuorpdfmcyhltzjkw')))
+
+        self.assertEqual(cipher.decrypt('wkjztlhycmfdproungaiqevbxs'),
+                         'zyxwvutsrqponmlkjihgfedcba')
+
+    def test_simple_bad(self):
+        self.assertRaises(TypeError, goldbug.cipher.Simple, 14)
+
+    def test_simple_misc(self):
+        self.assertEqual(repr(goldbug.cipher.Simple({'a': '!'})),
+                         "Simple({'a': '!'})")
 
 class Column(unittest.TestCase):
     def test_column_encryption(self):
