@@ -442,3 +442,111 @@ class Column(Cipher):
 
     def __repr__(self):
         return '%s(%r, pad=%r)' % (self.__class__.__name__, self.key, self.pad)
+
+
+# Other ciphers
+
+class Bifid(Cipher):
+    """
+    The bifid cipher, invented around 1901 by Felix Delastelle, combines
+    fractionated substitution with transmutation by way of a Polybius square,
+    which is the cipher key.
+
+    To demonstrate, let's assume we're using the following Polybius square:
+
+        B G W K Z
+        Q P N D S
+        I O A X E
+        F C L U M
+        T H Y V R
+
+    To encrypt a message, the plaintext characters' coordinates in the Polybius
+    square are written vertically in a row, and the rows are then joined.
+    Suppose our plaintext is "FLEEATONCE":
+
+        F L E E A T O N C E
+        3 3 2 2 2 4 2 1 3 2     <- X coordinate
+        0 2 4 4 2 0 1 2 1 4     <- Y coordinate
+
+        => 3 3 2 2 2 4 2 1 3 2 0 2 4 4 2 0 1 2 1 4
+
+    These numbers are then taken pairwise as the coordinates of our ciphertext
+    characters:
+
+        (3, 3) -> U
+        (2, 2) -> A
+        etc.
+
+        => UAEOLWRINS
+
+    Decryption is the same thing in reverse.
+
+    Longer messages are usually broken up into smaller components. The length
+    of these components is the period of the cipher.
+    """
+    def __init__(self, key, period=0):
+        """
+        key should be a string or a Polybius square.
+        period should be an integer; non-positive not to use one.
+        """
+        if not isinstance(key, Polybius):
+            key = Polybius('', key)
+        self.polybius = key
+        self.period = int(period)
+
+        self.key = ''
+        for c in key.key + key.alphabet:
+            if c not in self.key:
+                self.key += c
+
+    def encrypt(self, text):
+        """
+        Transforms plaintext into ciphertext.
+        """
+        if self.period > 0:
+            blocks = (self.__encrypt_block(text[i * self.period
+                                               :(i + 1) * self.period])
+                           for i in range(len(text) // self.period + 1))
+            return ''.join(blocks)
+        else:
+            return self.__encrypt_block(text)
+
+    def decrypt(self, text):
+        """
+        Transforms ciphertext into plaintext.
+        """
+        if self.period > 0:
+            blocks = (self.__decrypt_block(text[i * self.period
+                                               :(i + 1) * self.period])
+                           for i in range(len(text) // self.period + 1))
+            return ''.join(blocks)
+        else:
+            return self.__decrypt_block(text)
+
+    def __encrypt_block(self, text):
+        # Look up the coordinates of each plaintext character.
+        pairs = [self.polybius[c] for c in text.lower()]
+
+        # Write them in columns and read the rows.
+        rows = list(zip(*pairs))
+
+        # Look up the characters for each new pair of coordinates.
+        pairs = (c for c in rows[0] + rows[1])
+        return ''.join(self.polybius[pair] for pair in zip(pairs, pairs))
+
+    def __decrypt_block(self, text):
+        # Look up the coordinates of each ciphertext character.
+        pairs = sum([self.polybius[c] for c in text], ())
+
+        # Divide into equal rows and pair them up for the original pairs.
+        pairs = zip(pairs[:len(text)], pairs[len(text):])
+
+        # Look up the plaintext characters.
+        return ''.join(self.polybius[pair] for pair in pairs)
+
+    def __repr__(self):
+        if self.period > 0:
+            return '%s(%r, %r)' % (self.__class__.__name__,
+                                   self.key, self.period)
+        else:
+            return '%s(%r)' % (self.__class__.__name__, self.key)

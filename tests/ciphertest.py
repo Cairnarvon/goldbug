@@ -322,5 +322,47 @@ class Column(unittest.TestCase):
         self.assertEqual(repr(goldbug.cipher.Column('german', 'q')),
                          "Column('german', pad='q')")
 
+class BifidTest(unittest.TestCase):
+    def test_bifid_encrypt(self):
+        cipher = goldbug.cipher.Bifid('bgwkzqpndsioaxefclumthyvr')
+        self.assertEqual(cipher.encrypt('fleeatonce'), 'uaeolwrins')
+
+        poly = goldbug.cipher.Polybius('bgwkzqpndsioaxefclumthyvr')
+        self.assertEqual(goldbug.cipher.Bifid(poly).encrypt('anything'),
+                         cipher.encrypt('anything'))
+
+        cipher = goldbug.cipher.Bifid('phqgmeaylnofdxkrcvszwbuti', 5)
+        self.assertEqual(cipher.encrypt('defendtheeastwallofthecastle'),
+                         'ffyhmkhycpliashadtrlhcchlblr')
+
+    def test_bifid_decrypt(self):
+        cipher = goldbug.cipher.Bifid('bgwkzqpndsioaxefclumthyvr')
+        self.assertEqual(cipher.decrypt('uaeolwrins'), 'fleeatonce')
+
+        poly = goldbug.cipher.Polybius('bgwkzqpndsioaxefclumthyvr')
+        self.assertEqual(goldbug.cipher.Bifid(poly).decrypt('anything'),
+                         cipher.decrypt('anything'))
+
+        cipher = goldbug.cipher.Bifid('phqgmeaylnofdxkrcvszwbuti', 5)
+        self.assertEqual(cipher.decrypt('ffyhmkhycpliashadtrlhcchlblr'),
+                         'defendtheeastwallofthecastle')
+
+    def test_bifid_bad(self):
+        cipher = goldbug.cipher.Bifid('bgwkzqpndsioaxefclumthyvr')
+        self.assertRaises(KeyError, cipher.encrypt, '!!!')
+        self.assertRaises(KeyError, cipher.decrypt, '!!!')
+
+    def test_bifid_misc(self):
+        self.assertEqual(repr(goldbug.cipher.Bifid('bgwkzqpndsioaxefclumthyvr')),
+                         "Bifid('bgwkzqpndsioaxefclumthyvr')")
+
+        poly = goldbug.cipher.Polybius('bgwkzqpndsioaxefclumthyvr')
+        self.assertEqual(repr(goldbug.cipher.Bifid(poly)),
+                         "Bifid('bgwkzqpndsioaxefclumthyvr')")
+
+        cipher = goldbug.cipher.Bifid('bgwkzqpndsioaxefclumthyvr', 3)
+        self.assertEqual(repr(cipher), "Bifid('bgwkzqpndsioaxefclumthyvr', 3)")
+
+
 if __name__ == '__main__':
     unittest.main()

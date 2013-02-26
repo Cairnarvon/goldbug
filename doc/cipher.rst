@@ -245,6 +245,86 @@ characters or groups of them.
    :param pad: a single character used for padding.
 
 
+Other ciphers
+-------------
+
+These ciphers combine substitution with transposition, or have something
+exotic going on that makes them difficult to classify.
+
+.. class:: Bifid(key, period=0)
+
+   The bifid cipher was invented around 1901 by Félix Delastelle, and was
+   notable in that it combined fractionated substitution with transposition by
+   way of a :class:`Polybius` square.
+
+   To demonstrate, let's use the following square as the key:
+
+   +-------+-------+-------+-------+-------+-------+
+   |       | **0** | **1** | **2** | **3** | **4** |
+   +-------+-------+-------+-------+-------+-------+
+   | **0** | b     | g     | w     | k     | z     |
+   +-------+-------+-------+-------+-------+-------+
+   | **1** | q     | p     | n     | d     | s     |
+   +-------+-------+-------+-------+-------+-------+
+   | **2** | i     | o     | a     | x     | e     |
+   +-------+-------+-------+-------+-------+-------+
+   | **3** | f     | c     | l     | u     | m     |
+   +-------+-------+-------+-------+-------+-------+
+   | **4** | t     | h     | y     | v     | r     |
+   +-------+-------+-------+-------+-------+-------+
+
+   To encrypt a message, the plaintext characters' coordinates are written
+   vertically in a row, like so:
+
+   +-------+---+---+---+---+---+---+---+---+---+---+
+   |       | f | l | e | e | a | t | o | n | c | e |
+   +=======+===+===+===+===+===+===+===+===+===+===+
+   | **X** | 3 | 3 | 2 | 2 | 2 | 4 | 2 | 1 | 3 | 1 |
+   +-------+---+---+---+---+---+---+---+---+---+---+
+   | **Y** | 0 | 2 | 4 | 4 | 2 | 0 | 1 | 2 | 1 | 4 |
+   +-------+---+---+---+---+---+---+---+---+---+---+
+
+   (Our plaintext, obviously, is ``fleeatonce``.)
+
+   The rows are the joined, and the numbers taken pairwise as the coordinates
+   of our ciphertext characters:
+
+   +--------+---+
+   |        | ↓ |
+   +========+===+
+   | (3, 3) | u |
+   +--------+---+
+   | (2, 2) | a |
+   +--------+---+
+   | (2, 4) | e |
+   +--------+---+
+   | (2, 1) | o |
+   +--------+---+
+   | (3, 1) | l |
+   +--------+---+
+   | (0, 2) | w |
+   +--------+---+
+   | (4, 4) | r |
+   +--------+---+
+   | (2, 0) | i |
+   +--------+---+
+   | (1, 2) | n |
+   +--------+---+
+   | (1, 4) | s |
+   +--------+---+
+
+   Our ciphertext is then ``uaeolwrins``.
+
+   Decryption is the whole thing in reverse.
+
+   Longer messages are usually broken up into smaller chunks. The length of
+   these chunks is called the **period** of the cipher.
+
+   :param key: a :class:`Polybius` square, or a string used to construct one.
+   :param period: an integer; if non-positive, text will be encrypted and
+                  decrypted whole.
+
+
 Miscellaneous
 -------------
 
