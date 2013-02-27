@@ -5,6 +5,7 @@ Utilities for studying and breaking classical ciphers.
 """
 
 import collections
+import string
 
 def frequency_analysis(text, ngram=1):
     """
@@ -36,6 +37,19 @@ def chi2(text, freqs):
         else:
             acc += (c_i - e_i)**2 / e_i
     return acc
+
+def ic(text, alphabet=string.ascii_lowercase):
+    """
+    Calculates the monographic index of coincidence for a given piece of text.
+    """
+    text = [c for c in text if c in alphabet]
+    if len(text) < 2:
+        raise ValueError('Text is too short!')
+    ic = 0
+    for c in alphabet:
+        fi = text.count(c)
+        ic += fi * (fi - 1)
+    return ic / (len(text) * (len(text) - 1) / float(len(alphabet)))
 
 def egcd(a, b):
     """

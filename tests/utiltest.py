@@ -42,5 +42,11 @@ class MMITest(unittest.TestCase):
 
         self.assertRaises(ValueError, goldbug.util.mmi, 2, 4)
 
+class ICTest(unittest.TestCase):
+    def test_ic(self):
+        self.assertEqual(goldbug.util.ic('abcdefghijklmnopqrstuvwxyz'), 0.0)
+        self.assertAlmostEqual(goldbug.util.ic('something or other'), 1.5166667)
+        self.assertRaises(ValueError, goldbug.util.ic, '')
+
 if __name__ == '__main__':
     unittest.main()
