@@ -7,6 +7,8 @@ these should considered broken; they are provided for educational and historical
 purposes, not security.
 """
 
+import itertools
+import math
 import string
 
 try:
@@ -442,6 +444,107 @@ class Column(Cipher):
 
     def __repr__(self):
         return '%s(%r, pad=%r)' % (self.__class__.__name__, self.key, self.pad)
+
+class RailFence(Cipher):
+    """
+    Rail Fence cipher.
+    """
+    def __init__(self, key):
+        self.key = int(key)
+        if key < 1:
+            raise ValueError('Key should be strictly positive!')
+
+    def encrypt(self, text):
+        """
+        Transforms plaintext into ciphertext.
+        """
+        if self.key == 1:
+            # Degenerate case.
+            return text
+
+        rails = [[] for _ in range(self.key)]
+        indices = itertools.cycle(list(range(self.key - 1)) +
+                                  list(range(self.key - 1, 0, -1)))
+        for c in text:
+            rails[next(indices)].append(c)
+        return ''.join(sum(rails, []))
+
+    def decrypt(self, text):
+        """
+        Transforms ciphertext into plaintext.
+        """
+        if self.key == 1:
+            # Degenerate case.
+            return text
+
+        # We're going to divide the ciphertext back up into rows. This is
+        # slightly tricky.
+        # Consider that each ciphertext has a period of a certain length
+        # depending on the key (equal to (key - 1) * 2):
+        #
+        # <---------> <---------> <---------> <--
+        # x . . . . . x . . . . . x . . . . . x .
+        # . d . . . a . d . . . a . d . . . r . d
+        # . . d . a . . . d . a . . . d . r . . .
+        # . . . x . . . . . x . . . . . x . . . .
+        #
+        # Each row other than the top and bottom has a number of characters on
+        # the descending limb (d on the figure) equal to the number of periods
+        # for a text of a length equal to the total ciphertext length minus the
+        # row number (if top is 0), and a number of characters on the ascending
+        # limb (a on the figure) equal to the number of periods for a text of a
+        # length equal to the total ciphertext length minus the row number,
+        # minus the first skip, which is the distance from d to a.
+        # That first skip is equal to the key minus the row number minus 1,
+        # times 2.
+        # Therefore we can calculate the number of characters on each row and
+        # use that information to divide our ciphertext.
+        #
+        # The top and bottom row are special in that their ascending and
+        # descending characters coincide, but that makes them easier to
+        # calculate; the top row is just the number of periods, and the bottom
+        # is everything that's left over.
+
+        rows = []
+
+        # Top row is special.
+        rowend = int(math.ceil(self.__periods(len(text))))
+        rows.append(text[:rowend])
+
+        rowstart = rowend
+        for i in range(1, self.key - 1):
+            periods = self.__periods(len(text) - i)
+            rowend = int(
+                rowstart +
+                math.ceil(self.__periods(len(text) - i)) +  # descending
+                math.ceil(self.__periods(len(text) - i -
+                          (self.key - i - 1) * 2))          # ascending
+            )
+            rows.append(text[rowstart:rowend])
+            rowstart = rowend
+
+        # Bottom row is special too.
+        rows.append(text[rowstart:])
+
+        # Now just go up and down the rows.
+        gens = [(c for c in row) for row in rows]
+        indices = itertools.cycle(list(range(self.key - 1)) +
+                                  list(range(self.key - 1, 0, -1)))
+        return ''.join(next(gens[next(indices)]) for _ in range(len(text)))
+
+    def __periods(self, length):
+        """
+        Calculates the number of periods present in a text of the given length.
+
+        For instance, for a key of 3 and a length of 10, this is 2.5:
+
+        <--1--> <--2--> <--
+        x . . . x . . . x .
+        . x . x . x . x . x
+        . . x . . . x . . .
+
+        """
+        return float(length) / ((self.key - 1) * 2)
 
 
 # Other ciphers

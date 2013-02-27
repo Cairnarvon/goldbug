@@ -329,6 +329,59 @@ class ColumnTest(unittest.TestCase):
         self.assertEqual(repr(goldbug.cipher.Column('german', 'q')),
                          "Column('german', pad='q')")
 
+class RailFenceTest(unittest.TestCase):
+    def test_railfence_encrypt(self):
+        cipher = goldbug.cipher.RailFence(3)
+        self.assertEqual(cipher.encrypt('defendtheeastwallofthecastle'),
+                         'dnetlhseedheswloteateftaafcl')
+        self.assertEqual(cipher.encrypt('wearediscoveredfleeatonce'),
+                         'wecrlteerdsoeefeaocaivden')
+
+        cipher = goldbug.cipher.RailFence(4)
+        self.assertEqual(cipher.encrypt('defendtheeastwallofthecastle'),
+                         'dttfsedhswotatfneaalhcleelee')
+
+        cipher = goldbug.cipher.RailFence(1)
+        self.assertEqual(cipher.encrypt('anything'), 'anything')
+
+        cipher = goldbug.cipher.RailFence(50)
+        self.assertEqual(cipher.encrypt('tooshort'), 'tooshort')
+
+    def test_railfence_decrypt(self):
+        cipher = goldbug.cipher.RailFence(3)
+        self.assertEqual(cipher.decrypt('dnetlhseedheswloteateftaafcl'),
+                         'defendtheeastwallofthecastle')
+        self.assertEqual(cipher.decrypt('wecrlteerdsoeefeaocaivden'),
+                         'wearediscoveredfleeatonce')
+
+        cipher = goldbug.cipher.RailFence(4)
+        self.assertEqual(cipher.decrypt('dttfsedhswotatfneaalhcleelee'),
+                         'defendtheeastwallofthecastle')
+
+        cipher = goldbug.cipher.RailFence(1)
+        self.assertEqual(cipher.decrypt('anything'), 'anything')
+
+        cipher = goldbug.cipher.RailFence(50)
+        self.assertEqual(cipher.decrypt('tooshort'), 'tooshort')
+
+    def test_railfence_bad(self):
+        self.assertRaises(ValueError, goldbug.cipher.RailFence, -1)
+        self.assertRaises(ValueError, goldbug.cipher.RailFence, 'secret')
+
+        cipher = goldbug.cipher.RailFence(1)
+        self.assertRaises(ZeroDivisionError, cipher._RailFence__periods, 12)
+
+    def test_railfence_misc(self):
+        self.assertEqual(repr(goldbug.cipher.RailFence(4)), 'RailFence(4)')
+
+        cipher = goldbug.cipher.RailFence(3)
+        self.assertAlmostEqual(cipher._RailFence__periods(18), 4.5)
+        self.assertAlmostEqual(cipher._RailFence__periods(4), 1.0)
+
+        cipher = goldbug.cipher.RailFence(4)
+        self.assertAlmostEqual(cipher._RailFence__periods(18), 3.0)
+        self.assertAlmostEqual(cipher._RailFence__periods(4), 0.6666667)
+
 
 # Other ciphers.
 

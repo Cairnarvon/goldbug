@@ -244,6 +244,31 @@ characters or groups of them.
    :param key: a short string with no repeated characters.
    :param pad: a single character used for padding.
 
+.. class:: RailFence(key)
+
+   The rail fence cipher, also called the zig-zag cipher, is a straightforward
+   transposition cipher in which plaintext characters are written in a zig-zag
+   across rails. The key is the number of rails used.
+
+   If our plaintext is ``thisisanexample`` and our key is 4, this looks like
+   this:
+
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---------+
+      | t |   |   |   |   |   | a |   |   |   |   |   | p |   |   | → tap   |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---------+
+      |   | h |   |   |   | s |   | n |   |   |   | m |   | l |   | → hsnml |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---------+
+      |   |   | i |   | i |   |   |   | e |   | a |   |   |   | e | → iieae |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---------+
+      |   |   |   | s |   |   |   |   |   | x |   |   |   |   |   | → sx    |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---------+
+
+   The ciphertext is then read directly from the rails: ``taphsnmliieaesx``.
+
+   If the message doesn't have more characters than there are rails, or there
+   is only one rail, the ciphertext is identical to the plaintext, of course.
+
+   :param key: a positive integer.
 
 Other ciphers
 -------------
