@@ -653,3 +653,118 @@ class Bifid(Cipher):
                                    self.key, self.period)
         else:
             return '%s(%r)' % (self.__class__.__name__, self.key)
+
+class Trifid(Cipher):
+    """
+    The trifid cipher is another cipher by Felix Delastelle. It extends the
+    concept of his bifid cipher into the third dimension; where the bifid
+    cipher uses a Polybius square as the key, the trifid cipher uses a stack
+    of n n x n Polybius squares (where n is canonically 3) as a Polybius
+    cube.
+
+    Other than dealing with three coordinates instead of two, the trifid
+    cipher works in essentially the same way as the bifid cipher.
+    """
+    def __init__(self, key, period=0):
+        """
+        key is a string of a length with an integral cube root (canonically 27)
+        or a sequence of n Polybius squares with dimensions n x n and no shared
+        characters between them.
+        period is an integer; if not positive, texts aren't divided into
+        blocks.
+        """
+        if all(isinstance(k, Polybius) for k in key):
+            self.keys = key
+        else:
+            side = int(round(len(key) ** (1. / 3)))
+            if side * side * side != len(key):
+                raise ValueError('Key length must have integral cube root!')
+            self.keys = [Polybius('', key[i:i + side * side])
+                         for i in range(0, len(key), side * side)]
+
+        self.key = []
+        for key in self.keys:
+            for c in key.key + key.alphabet:
+                if c not in self.key:
+                    self.key.append(c)
+        self.key = ''.join(self.key)
+
+        if not all(len(set(key.key + key.alphabet)) ==
+                   len(self.keys) * len(self.keys) for key in self.keys) or \
+           len(self.key) != len(self.keys) ** 3:
+            raise ValueError('Invalid key!')
+
+        self.period = int(period)
+
+    def encrypt(self, text):
+        """
+        Transforms plaintext into ciphertext.
+        """
+        # Partition according to the period.
+        if self.period < 1:
+            self.period = len(text)
+        blocks = [text[i:i + self.period] for i in range(0,
+                                                         len(text),
+                                                         self.period)]
+
+        # Encrypt the blocks and return the results.
+        blocks = [list(self.__encrypt_block(block)) for block in blocks]
+        return ''.join(''.join(block) for block in blocks)
+
+    def decrypt(self, text):
+        """
+        Transforms ciphertext into plaintext.
+        """
+        # Partition according to the period.
+        if self.period < 1:
+            self.period = len(text)
+        blocks = [text[i:i + self.period] for i in range(0,
+                                                         len(text),
+                                                         self.period)]
+
+        # Decrypt the blocks and return the results.
+        blocks = [list(self.__decrypt_block(block)) for block in blocks]
+        return ''.join(''.join(block) for block in blocks)
+
+    def __encrypt_block(self, block):
+        # Look up the coordinates for each of our characters.
+        coords = []
+        for c in block:
+            for i, key in enumerate(self.keys):
+                if c in key:
+                    coords.append((i,) + key[c])
+
+        # Transform from column orientation to row orientation, and catenate.
+        coords = sum(zip(*coords), ())
+
+        # Yield characters for new coordinates.
+        gen = (c for c in coords)
+        for s, x, y in zip(gen, gen, gen):
+            yield self.keys[s][(x, y)]
+
+    def __decrypt_block(self, block):
+        # Look up the coordinates for each of our characters.
+        coords = []
+        for c in block:
+            for i, key in enumerate(self.keys):
+                if c in key:
+                    coords.append((i,) + key[c])
+        coords = sum(coords, ())
+
+        # Split, and transform from row orientation to column orientation.
+        coords = [coords[i:i + len(coords) // 3]
+                  for i in range(0, len(coords), len(coords) // 3)]
+        coords = zip(*coords)
+
+        # Yield character for new coordinates.
+        for s, x, y in coords:
+            if (x, y) not in self.keys[s]:
+                raise ValueError('Invalid ciphertext!')
+            yield self.keys[s][(x, y)]
+
+    def __repr__(self):
+        if self.period < 1:
+            return '%s(%r)' % (self.__class__.__name__, self.key)
+        else:
+            return '%s(%r, period=%r)' % (self.__class__.__name__,
+                                          self.key, self.period)

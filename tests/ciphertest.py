@@ -426,6 +426,37 @@ class BifidTest(unittest.TestCase):
         cipher = goldbug.cipher.Bifid('bgwkzqpndsioaxefclumthyvr', 3)
         self.assertEqual(repr(cipher), "Bifid('bgwkzqpndsioaxefclumthyvr', 3)")
 
+class TrifidTest(unittest.TestCase):
+    def test_trifid_encrypt(self):
+        cipher = goldbug.cipher.Trifid('epsducvwym.zlkxnbtfgorijhaq', 5)
+        self.assertEqual(cipher.encrypt('defendtheeastwallofthecastle'),
+                         'suefecphsegyyjiximfofocejlrf')
+
+        cipher = goldbug.cipher.Trifid('abcdefgh', -1)
+        self.assertEqual(cipher.encrypt('abcdefgh'), 'adgdbfcf')
+
+    def test_trifid_decrypt(self):
+        cipher = goldbug.cipher.Trifid('epsducvwym.zlkxnbtfgorijhaq', 5)
+        self.assertEqual(cipher.decrypt('suefecphsegyyjiximfofocejlrf'),
+                         'defendtheeastwallofthecastle')
+
+        cipher = goldbug.cipher.Trifid('abcdefgh', -1)
+        self.assertEqual(cipher.decrypt('adgdbfcf'), 'abcdefgh')
+
+    def test_trifid_bad(self):
+        self.assertRaises(ValueError, goldbug.cipher.Trifid, 'ab', 3)
+        self.assertRaises(ValueError, goldbug.cipher.Trifid,
+                          [goldbug.cipher.Polybius('', 'abcd')], 2)
+
+        cipher = goldbug.cipher.Trifid('abcdefgh', 3)
+        self.assertRaises(ValueError, cipher.decrypt, 'ijklm')
+
+    def test_trifid_misc(self):
+        self.assertEqual(repr(goldbug.cipher.Trifid('abcdefgh', 3)),
+                         "Trifid('abcdefgh', period=3)")
+        self.assertEqual(repr(goldbug.cipher.Trifid('.', -1)),
+                         "Trifid('.')")
+
 
 if __name__ == '__main__':
     unittest.main()
