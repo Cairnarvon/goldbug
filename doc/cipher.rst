@@ -7,12 +7,12 @@
 This module implements various classical ciphers. They're used something like
 this:
 
-    >>> from goldbug.cipher import Caesar
-    >>> cipher = Caesar(4)
-    >>> cipher.encrypt('Gallia est omnis divisa in partes tres.')
-    'Keppme iwx sqrmw hmzmwe mr tevxiw xviw.'
-    >>> cipher.decrypt('Keppme iwx sqrmw hmzmwe mr tevxiw xviw.')
-    'Gallia est omnis divisa in partes tres.'
+   >>> from goldbug.cipher import Caesar
+   >>> cipher = Caesar(4)
+   >>> cipher.encrypt('Gallia est omnis divisa in partes tres.')
+   'Keppme iwx sqrmw hmzmwe mr tevxiw xviw.'
+   >>> cipher.decrypt('Keppme iwx sqrmw hmzmwe mr tevxiw xviw.')
+   'Gallia est omnis divisa in partes tres.'
 
 All ciphers inherit from a base class:
 
@@ -108,13 +108,13 @@ a **simple** substitution cipher; if it operates on groups of characters, it is
 
    For example, with the key ``SECRET``:
 
-   +----------------+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-   |                | ↓ |                                                                                                   |
-   +================+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+
-   | **Plaintext**  | A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q | R | S | T | U | V | W | X | Y | Z |
-   +----------------+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-   | **Ciphertext** | S | E | C | R | T | A | B | D | F | G | H | I | J | K | L | M | N | O | P | Q | U | V | W | X | Y | Z |
-   +----------------+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+      +----------------+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+      |                | ↓ |                                                                                                   |
+      +================+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+
+      | **Plaintext**  | A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q | R | S | T | U | V | W | X | Y | Z |
+      +----------------+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+      | **Ciphertext** | S | E | C | R | T | A | B | D | F | G | H | I | J | K | L | M | N | O | P | Q | U | V | W | X | Y | Z |
+      +----------------+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
    :param key: a short string.
 
@@ -208,15 +208,15 @@ characters or groups of them.
    First, the plaintext is padded until its length is a multiple of the key
    length and placed into columns below the key, as follows:
 
-   +---+---+---+---+---+---+
-   | C | I | P | H | E | R |
-   +===+===+===+===+===+===+
-   | t | h | i | s | i | s |
-   +---+---+---+---+---+---+
-   | a | n | e | x | a | m |
-   +---+---+---+---+---+---+
-   | p | l | e | x | x | x |
-   +---+---+---+---+---+---+
+      +---+---+---+---+---+---+
+      | C | I | P | H | E | R |
+      +===+===+===+===+===+===+
+      | t | h | i | s | i | s |
+      +---+---+---+---+---+---+
+      | a | n | e | x | a | m |
+      +---+---+---+---+---+---+
+      | p | l | e | x | x | x |
+      +---+---+---+---+---+---+
 
    In this example, the plaintext is ``thisisanexample``, the key is ``CIPHER``,
    and the padding character is ``x``.
@@ -224,15 +224,15 @@ characters or groups of them.
    In the second step, the columns are moved so that the key's characters are
    in alphabetical order:
 
-   +---+---+---+---+---+---+
-   | C | E | H | I | P | R |
-   +===+===+===+===+===+===+
-   | t | i | s | h | i | s |
-   +---+---+---+---+---+---+
-   | a | a | x | n | e | m |
-   +---+---+---+---+---+---+
-   | p | x | x | l | e | x |
-   +---+---+---+---+---+---+
+      +---+---+---+---+---+---+
+      | C | E | H | I | P | R |
+      +===+===+===+===+===+===+
+      | t | i | s | h | i | s |
+      +---+---+---+---+---+---+
+      | a | a | x | n | e | m |
+      +---+---+---+---+---+---+
+      | p | x | x | l | e | x |
+      +---+---+---+---+---+---+
 
    Then the key row is removed, and the columns are catenated to form the
    ciphertext; in this case, ``tapiaxsxxhnlieesmx``.
@@ -284,59 +284,59 @@ exotic going on that makes them difficult to classify.
 
    To demonstrate, let's use the following square as the key:
 
-   +-------+-------+-------+-------+-------+-------+
-   |       | **0** | **1** | **2** | **3** | **4** |
-   +-------+-------+-------+-------+-------+-------+
-   | **0** | b     | g     | w     | k     | z     |
-   +-------+-------+-------+-------+-------+-------+
-   | **1** | q     | p     | n     | d     | s     |
-   +-------+-------+-------+-------+-------+-------+
-   | **2** | i     | o     | a     | x     | e     |
-   +-------+-------+-------+-------+-------+-------+
-   | **3** | f     | c     | l     | u     | m     |
-   +-------+-------+-------+-------+-------+-------+
-   | **4** | t     | h     | y     | v     | r     |
-   +-------+-------+-------+-------+-------+-------+
+      +-------+-------+-------+-------+-------+-------+
+      |       | **0** | **1** | **2** | **3** | **4** |
+      +-------+-------+-------+-------+-------+-------+
+      | **0** | b     | g     | w     | k     | z     |
+      +-------+-------+-------+-------+-------+-------+
+      | **1** | q     | p     | n     | d     | s     |
+      +-------+-------+-------+-------+-------+-------+
+      | **2** | i     | o     | a     | x     | e     |
+      +-------+-------+-------+-------+-------+-------+
+      | **3** | f     | c     | l     | u     | m     |
+      +-------+-------+-------+-------+-------+-------+
+      | **4** | t     | h     | y     | v     | r     |
+      +-------+-------+-------+-------+-------+-------+
 
    To encrypt a message, the plaintext characters' coordinates are written
    vertically in a row, like so:
 
-   +-------+---+---+---+---+---+---+---+---+---+---+
-   |       | f | l | e | e | a | t | o | n | c | e |
-   +=======+===+===+===+===+===+===+===+===+===+===+
-   | **X** | 3 | 3 | 2 | 2 | 2 | 4 | 2 | 1 | 3 | 1 |
-   +-------+---+---+---+---+---+---+---+---+---+---+
-   | **Y** | 0 | 2 | 4 | 4 | 2 | 0 | 1 | 2 | 1 | 4 |
-   +-------+---+---+---+---+---+---+---+---+---+---+
+      +-------+---+---+---+---+---+---+---+---+---+---+
+      |       | f | l | e | e | a | t | o | n | c | e |
+      +=======+===+===+===+===+===+===+===+===+===+===+
+      | **X** | 3 | 3 | 2 | 2 | 2 | 4 | 2 | 1 | 3 | 1 |
+      +-------+---+---+---+---+---+---+---+---+---+---+
+      | **Y** | 0 | 2 | 4 | 4 | 2 | 0 | 1 | 2 | 1 | 4 |
+      +-------+---+---+---+---+---+---+---+---+---+---+
 
    (Our plaintext, obviously, is ``fleeatonce``.)
 
    The rows are the joined, and the numbers taken pairwise as the coordinates
    of our ciphertext characters:
 
-   +--------+---+
-   |        | ↓ |
-   +========+===+
-   | (3, 3) | u |
-   +--------+---+
-   | (2, 2) | a |
-   +--------+---+
-   | (2, 4) | e |
-   +--------+---+
-   | (2, 1) | o |
-   +--------+---+
-   | (3, 1) | l |
-   +--------+---+
-   | (0, 2) | w |
-   +--------+---+
-   | (4, 4) | r |
-   +--------+---+
-   | (2, 0) | i |
-   +--------+---+
-   | (1, 2) | n |
-   +--------+---+
-   | (1, 4) | s |
-   +--------+---+
+     +--------+---+
+     |        | ↓ |
+     +========+===+
+     | (3, 3) | u |
+     +--------+---+
+     | (2, 2) | a |
+     +--------+---+
+     | (2, 4) | e |
+     +--------+---+
+     | (2, 1) | o |
+     +--------+---+
+     | (3, 1) | l |
+     +--------+---+
+     | (0, 2) | w |
+     +--------+---+
+     | (4, 4) | r |
+     +--------+---+
+     | (2, 0) | i |
+     +--------+---+
+     | (1, 2) | n |
+     +--------+---+
+     | (1, 4) | s |
+     +--------+---+
 
    Our ciphertext is then ``uaeolwrins``.
 
@@ -367,17 +367,17 @@ These things aren't ciphers in themselves, but are used by them.
    This class provides a :class:`dict`-like mapping from characters to (row,
    column) tuples and vice versa. It converts to a string nicely:
 
-    >>> from goldbug.cipher import Polybius
-    >>> kana = 'いろはにほへとちりぬるをわかよたれそつねならむうゐのおくやまけふこえてあさきゆめみしゑひもせすん。'
-    >>> uesugi = Polybius('', kana)
-    >>> print(uesugi)
-    い ろ は に ほ へ と
-    ち り ぬ る を わ か
-    よ た れ そ つ ね な
-    ら む う ゐ の お く
-    や ま け ふ こ え て
-    あ さ き ゆ め み し
-    ゑ ひ も せ す ん 。
+      >>> from goldbug.cipher import Polybius
+      >>> kana = 'いろはにほへとちりぬるをわかよたれそつねならむうゐのおくやまけふこえてあさきゆめみしゑひもせすん。'
+      >>> uesugi = Polybius('', kana)
+      >>> print(uesugi)
+      い ろ は に ほ へ と
+      ち り ぬ る を わ か
+      よ た れ そ つ ね な
+      ら む う ゐ の お く
+      や ま け ふ こ え て
+      あ さ き ゆ め み し
+      ゑ ひ も せ す ん 。
 
    If you're using Python 2.x, remember to pass :class:`unicode` objects if
    your key and alphabet aren't ASCII.
