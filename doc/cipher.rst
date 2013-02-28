@@ -353,19 +353,19 @@ exotic going on that makes them difficult to classify.
 
    The trifid cipher is another cipher by Félix Delastelle. It extends the
    :class:`Bifid` cipher into the third dimension; where the bifid cipher uses
-   a :class:`Polybius` square as the key, the trifid cipher uses a stack of
-   *n* *n* ✕ *n* Polybius squares as a Polybius cube.
+   a :class:`Polybius` square as the key, the trifid cipher uses an Polybius
+   cube.
 
-   Though *n* is canonically 3, allowing for a 27-character alphabet (usually
-   the 26 letters and the period), this implementation allows for arbitrary
-   sizes.
+   Though the cube's side is canonically 3, allowing for a 27-character
+   alphabet (usually the 26 letters and the period), this implementation allows
+   for arbitrary sizes.
 
    Other than dealing with three coordinates instead of two, the trifid cipher
    works in essentially the same way as the bifid cipher.
 
-   :param key: a sequence of *n* *n* ✕ *n* :class:`Polybius` squares sharing
-               no characters between them, or a string of a length with an
-               integral cube root (1, 8, 27, etc.) and no repeated characters.
+   :param key: a :class:`Polybius` cube (that is, **dimensions=3**), or a string
+               of a length with an integral cube root (1, 8, 27, etc.) and no
+               repeated characters.
    :param period: an integer; if non-positive, text will be encrypted and
                   decrypted whole.
 

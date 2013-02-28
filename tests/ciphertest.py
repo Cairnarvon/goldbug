@@ -486,7 +486,7 @@ class TrifidTest(unittest.TestCase):
     def test_trifid_bad(self):
         self.assertRaises(ValueError, goldbug.cipher.Trifid, 'ab', 3)
         self.assertRaises(ValueError, goldbug.cipher.Trifid,
-                          [goldbug.cipher.Polybius('', 'abcd')], 2)
+                          goldbug.cipher.Polybius('', 'abcd'), 2)
 
         cipher = goldbug.cipher.Trifid('abcdefgh', 3)
         self.assertRaises(ValueError, cipher.decrypt, 'ijklm')
