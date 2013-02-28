@@ -33,12 +33,28 @@ class PolybiusTest(unittest.TestCase):
         self.assertEqual(p['c'], (1, 0))
         self.assertEqual(p['d'], (1, 1))
 
+        p = goldbug.cipher.Polybius('', 'abcdefghijklmnopqrstuvwxyz.', 3)
+        self.assertEqual(p[0, 0, 0], 'a')
+        self.assertEqual(p[2, 2, 2], '.')
+        self.assertEqual(p['b'], (0, 0, 1))
+        self.assertEqual(p['z'], (2, 2, 1))
+
+        p = goldbug.cipher.Polybius('', '.', 1)
+        self.assertEqual(p[(0,)], '.')
+        self.assertEqual(p['.'], (0,))
+
     def test_polybius_str(self):
         p = goldbug.cipher.Polybius('', 'abcd')
         self.assertEqual(str(p), 'a b\nc d')
 
         p = goldbug.cipher.Polybius('d', 'd')
         self.assertEqual(str(p), 'd')
+
+        p = goldbug.cipher.Polybius('', '.', 1)
+        self.assertEqual(str(p), '.')
+
+        p = goldbug.cipher.Polybius('', 'abcdefghijklmnopqrstuvwxyz.', 3)
+        self.assertEqual(str(p), repr(p))
 
     def test_polybius_bad(self):
         self.assertRaises(ValueError, goldbug.cipher.Polybius, '', 'ab')
@@ -48,6 +64,30 @@ class PolybiusTest(unittest.TestCase):
         p = goldbug.cipher.Polybius('key')
         self.assertRaises(KeyError, p.__getitem__, '!')
         self.assertRaises(KeyError, p.__getitem__, (6, 6))
+        self.assertRaises(OverflowError, p._Polybius__index_to_coordinate, 25)
+
+        self.assertRaises(ValueError, goldbug.cipher.Polybius, '', dimensions=0)
+        self.assertRaises(ValueError, goldbug.cipher.Polybius, '', dimensions=-1)
+        self.assertRaises(ValueError, goldbug.cipher.Polybius, '', 'abcd', 3)
+
+    def test_polybius_misc(self):
+        p = goldbug.cipher.Polybius('key')
+        self.assertEqual(p._Polybius__index_to_coordinate(0), (0, 0))
+        self.assertEqual(p._Polybius__index_to_coordinate(1), (0, 1))
+        self.assertEqual(p._Polybius__index_to_coordinate(2), (0, 2))
+        self.assertEqual(p._Polybius__index_to_coordinate(5), (1, 0))
+        self.assertEqual(p._Polybius__index_to_coordinate(24), (4, 4))
+
+        p = goldbug.cipher.Polybius('', 'abcdefghijklmnopqrstuvwxyz.', 3)
+        self.assertEqual(p._Polybius__index_to_coordinate(0), (0, 0, 0))
+        self.assertEqual(p._Polybius__index_to_coordinate(1), (0, 0, 1))
+        self.assertEqual(p._Polybius__index_to_coordinate(2), (0, 0, 2))
+        self.assertEqual(p._Polybius__index_to_coordinate(3), (0, 1, 0))
+        self.assertEqual(p._Polybius__index_to_coordinate(9), (1, 0, 0))
+        self.assertEqual(p._Polybius__index_to_coordinate(26), (2, 2, 2))
+
+        p = goldbug.cipher.Polybius('', '.', 1)
+        self.assertEqual(p._Polybius__index_to_coordinate(0), (0,))
 
 
 # Substitution ciphers

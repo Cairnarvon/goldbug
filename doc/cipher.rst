@@ -375,17 +375,20 @@ Miscellaneous
 
 These things aren't ciphers in themselves, but are used by them.
 
-.. class:: Polybius(key, alphabet='abcdefghiklmnopqrstuvwxyz')
+.. class:: Polybius(key, alphabet='abcdefghiklmnopqrstuvwxyz', dimensions=2)
 
-   This is a representation of a Polybius square, also known as the Polybius
-   checkerboard.
+   This is a generalisation of the Polybius square or checkerboard to arbitrary
+   (integral, positive) dimensions.
 
-   The Polybius square maps an alphabet onto a checkboard, possibly with the
-   help of a key. It isn't particularly useful on its own, but it's used
-   by several classical ciphers.
+   The traditional Polybius square maps an alphabet onto a checkboard, possibly
+   with the help of a key. It isn't particularly useful on its own, but it's
+   used by several classical ciphers.
 
-   This class provides a :class:`dict`-like mapping from characters to (row,
-   column) tuples and vice versa. It converts to a string nicely:
+   This implementation generalises that and can map an alphabet to a square
+   (the default), a cube, or any hypercube. It provides a :class:`dict`-like
+   mapping from characters to coordinate tuples and vice versa.
+
+   For dimensions lower than 3, it converts to a string nicely:
 
       >>> from goldbug.cipher import Polybius
       >>> kana = 'いろはにほへとちりぬるをわかよたれそつねならむうゐのおくやまけふこえてあさきゆめみしゑひもせすん。'

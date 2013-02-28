@@ -40,7 +40,7 @@ class Polybius(dict):
     This automatically constructs a square out of a key and an alphabet, and
     exposes a mapping from letters to (row, column) tuples and vice versa.
     """
-    def __init__(self, key, alphabet='abcdefghiklmnopqrstuvwxyz'):
+    def __init__(self, key, alphabet='abcdefghiklmnopqrstuvwxyz', dimensions=2):
         """
         All key characters must occur in the alphabet.
         """
@@ -49,31 +49,64 @@ class Polybius(dict):
         self.key = key
         self.alphabet = alphabet
 
-        # We don't need to be 5×5, but we do need to be square.
-        self.side = int(len(alphabet) ** .5)
-        if self.side * self.side != len(alphabet):
-            raise ValueError("Can't map alphabet onto a square!")
+        # Get rid of duplicate characters in key.
+        k = []
+        for c in key:
+            if c not in k:
+                k.append(c)
+        key = ''.join(k)
+
+        # Alphabet isn't allowed to have duplicates at all.
+        if len(set(alphabet)) != len(alphabet):
+            raise ValueError('Alphabet is not a set!')
+
+        # All key characters should occur in the alphabet.
+        if not all(c in alphabet for c in key):
+            raise ValueError('Invalid key!')
+
+        # Keep track of contents for convenience.
+        if alphabet:
+            key = ''.join(c for c in key if c in alphabet)
+        self.contents = key + ''.join(c for c in alphabet if c not in key)
+
+        self.dimensions = int(dimensions)
+        if self.dimensions < 1:
+            raise ValueError('Dimension must be positive!')
+
+        # We don't need to be 5×5, but we do need to be regular.
+        self.side = int(round(len(self.contents) ** (1.0 / self.dimensions)))
+        if self.side ** self.dimensions != len(self.contents):
+            raise ValueError("Can't map key + alphabet onto a square!")
 
         # We need a mapping from letters to row/col numbers...
-        n = 0
-        for c in key + alphabet:
-            if c not in self:
-                self[c] = (n // self.side, n % self.side)
-                n += 1
-
-        if len(self) != len(alphabet):
-            raise ValueError('Invalid key or alphabet!')
+        for n, c in enumerate(self.contents):
+            self[c] = self.__index_to_coordinate(n)
 
         # ... and vice versa.
         for k in list(self.keys()):
             self[self[k]] = k
 
+    def __index_to_coordinate(self, index):
+        co, the_index = (), index
+        for i in range(self.dimensions):
+            quo, rem = divmod(index, self.side)
+            co = (rem,) + co
+            index = quo
+        if index != 0:
+            raise OverflowError('Index %d is out of range!' % the_index)
+        return co
+
     def __repr__(self):
         return '%s(%r, %r)' % (self.__class__.__name__, self.key, self.alphabet)
 
     def __str__(self):
-        return '\n'.join(' '.join(self[(r, c)] for c in range(self.side))
-                         for r in range(self.side))
+        if self.dimensions == 1:
+            return self[0,]
+        elif self.dimensions == 2:
+            return '\n'.join(' '.join(self[(r, c)] for c in range(self.side))
+                             for r in range(self.side))
+        else:
+            return repr(self)
 
 
 # Substitution ciphers
