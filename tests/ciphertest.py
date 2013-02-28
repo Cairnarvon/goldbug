@@ -489,11 +489,11 @@ class TrifidTest(unittest.TestCase):
                           goldbug.cipher.Polybius('', 'abcd'), 2)
 
         cipher = goldbug.cipher.Trifid('abcdefgh', 3)
-        self.assertRaises(ValueError, cipher.decrypt, 'ijklm')
+        self.assertRaises(KeyError, cipher.decrypt, 'ijklm')
 
     def test_trifid_misc(self):
         self.assertEqual(repr(goldbug.cipher.Trifid('abcdefgh', 3)),
-                         "Trifid('abcdefgh', period=3)")
+                         "Trifid('abcdefgh', 3)")
         self.assertEqual(repr(goldbug.cipher.Trifid('.', -1)),
                          "Trifid('.')")
 

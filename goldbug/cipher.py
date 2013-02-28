@@ -630,11 +630,6 @@ class Bifid(Cipher):
         self.polybius = key
         self.period = int(period)
 
-        self.key = ''
-        for c in key.key + key.alphabet:
-            if c not in self.key:
-                self.key += c
-
     def encrypt(self, text):
         """
         Transforms plaintext into ciphertext.
@@ -661,33 +656,35 @@ class Bifid(Cipher):
 
     def __encrypt_block(self, text):
         # Look up the coordinates of each plaintext character.
-        pairs = [self.polybius[c] for c in text.lower()]
+        coords = [self.polybius[c] for c in text.lower()]
 
         # Write them in columns and read the rows.
-        rows = list(zip(*pairs))
+        coords = sum(tuple(zip(*coords)), ())
 
         # Look up the characters for each new pair of coordinates.
-        pairs = (c for c in rows[0] + rows[1])
-        return ''.join(self.polybius[pair] for pair in zip(pairs, pairs))
+        return ''.join(self.polybius[coords[i:i + self.polybius.dimensions]]
+                       for i in range(0, len(coords), self.polybius.dimensions))
 
     def __decrypt_block(self, text):
         # Look up the coordinates of each ciphertext character.
-        pairs = sum([self.polybius[c] for c in text], ())
+        coords = sum([self.polybius[c] for c in text], ())
 
-        # Divide into equal rows and pair them up for the original pairs.
-        pairs = zip(pairs[:len(text)], pairs[len(text):])
+        # Divide into equal rows and join them up for the original coordinates.
+        rowlen = len(coords) // self.polybius.dimensions
+        rows = [coords[i:i + rowlen] for i in range(0, len(coords), rowlen)]
+        coords = zip(*rows)
 
         # Look up the plaintext characters.
-        return ''.join(self.polybius[pair] for pair in pairs)
+        return ''.join(self.polybius[tuple(co)] for co in coords)
 
     def __repr__(self):
         if self.period > 0:
             return '%s(%r, %r)' % (self.__class__.__name__,
-                                   self.key, self.period)
+                                   self.polybius.contents, self.period)
         else:
-            return '%s(%r)' % (self.__class__.__name__, self.key)
+            return '%s(%r)' % (self.__class__.__name__, self.polybius.contents)
 
-class Trifid(Cipher):
+class Trifid(Bifid):
     """
     The trifid cipher is another cipher by Felix Delastelle. It extends the
     concept of his bifid cipher into the third dimension; where the bifid
@@ -705,84 +702,9 @@ class Trifid(Cipher):
         period is an integer; if not positive, texts aren't divided into
         blocks.
         """
-        if isinstance(key, Polybius):
-            if key.dimensions != 3:
-                raise ValueError('Key must be a Polybius cube!')
-            self.key = key
-        else:
-            try:
-                self.key = Polybius('', key, 3)
-            except ValueError:
-                raise ValueError('Key length must have integral cube root!')
+        if not isinstance(key, Polybius):
+            key = Polybius('', key, 3)
+        if key.dimensions != 3:
+            raise ValueError('Key must be a Polybius cube!')
+        self.polybius = key
         self.period = int(period)
-
-    def encrypt(self, text):
-        """
-        Transforms plaintext into ciphertext.
-        """
-        # Partition according to the period.
-        if self.period < 1:
-            self.period = len(text)
-        blocks = [text[i:i + self.period] for i in range(0,
-                                                         len(text),
-                                                         self.period)]
-
-        # Encrypt the blocks and return the results.
-        blocks = [list(self.__encrypt_block(block)) for block in blocks]
-        return ''.join(''.join(block) for block in blocks)
-
-    def decrypt(self, text):
-        """
-        Transforms ciphertext into plaintext.
-        """
-        # Partition according to the period.
-        if self.period < 1:
-            self.period = len(text)
-        blocks = [text[i:i + self.period] for i in range(0,
-                                                         len(text),
-                                                         self.period)]
-
-        # Decrypt the blocks and return the results.
-        blocks = [list(self.__decrypt_block(block)) for block in blocks]
-        return ''.join(''.join(block) for block in blocks)
-
-    def __encrypt_block(self, block):
-        # Look up the coordinates for each of our characters.
-        coords = []
-        for c in block:
-            if c in self.key:
-                coords.append(self.key[c])
-
-        # Transform from column orientation to row orientation, and catenate.
-        coords = sum(zip(*coords), ())
-
-        # Yield characters for new coordinates.
-        gen = (c for c in coords)
-        for co in zip(gen, gen, gen):
-            yield self.key[co]
-
-    def __decrypt_block(self, block):
-        # Look up the coordinates for each of our characters.
-        coords = []
-        for c in block:
-            if c in self.key:
-                coords.append(self.key[c])
-        coords = sum(coords, ())
-
-        # Split, and transform from row orientation to column orientation.
-        coords = [coords[i:i + len(coords) // 3]
-                  for i in range(0, len(coords), len(coords) // 3)]
-        coords = zip(*coords)
-
-        # Yield character for new coordinates.
-        for co in coords:
-            if co not in self.key:
-                raise ValueError('Invalid ciphertext!')
-            yield self.key[co]
-
-    def __repr__(self):
-        if self.period < 1:
-            return '%s(%r)' % (self.__class__.__name__, self.key.contents)
-        else:
-            return '%s(%r, period=%r)' % (self.__class__.__name__,
-                                          self.key.contents, self.period)
