@@ -89,6 +89,34 @@ class PolybiusTest(unittest.TestCase):
         p = goldbug.cipher.Polybius('', '.', 1)
         self.assertEqual(p._Polybius__index_to_coordinate(0), (0,))
 
+class TabulaRectaTest(unittest.TestCase):
+    def test_tabula(self):
+        tabula = goldbug.cipher.TabulaRecta()
+        self.assertEqual(tabula['a', 'a'], 'a')
+        self.assertEqual(tabula['a', 'b'], 'b')
+        self.assertEqual(tabula['b', 'a'], 'b')
+        self.assertEqual(tabula['k', 'o'], 'y')
+
+        tabula = goldbug.cipher.TabulaRecta(reverse=True)
+        self.assertEqual(tabula['a', 'a'], 'a')
+        self.assertEqual(tabula['b', 'b'], 'a')
+        self.assertEqual(tabula['a', 'b'], 'z')
+        self.assertEqual(tabula['y', 'o'], 'k')
+
+        tabula = goldbug.cipher.TabulaRecta('abcd')
+        for a in 'abcd':
+            for b in 'abcd':
+                self.assertEqual(tabula[a, b], tabula[b, a])
+
+    def test_tabula_bad(self):
+        self.assertRaises(ValueError, goldbug.cipher.TabulaRecta, 'abcda')
+
+    def test_tabula_misc(self):
+        self.assertEqual(repr(goldbug.cipher.TabulaRecta()),
+                         "TabulaRecta('abcdefghijklmnopqrstuvwxyz')")
+        self.assertEqual(repr(goldbug.cipher.TabulaRecta('abc', True)),
+                         "TabulaRecta('abc', reverse=True)")
+
 
 # Substitution ciphers
 

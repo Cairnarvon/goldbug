@@ -108,6 +108,34 @@ class Polybius(dict):
         else:
             return repr(self)
 
+class TabulaRecta(dict):
+    """
+    A representation of the tabula recta for a given alphabet.
+    """
+    def __init__(self, alphabet=string.ascii_lowercase, reverse=False):
+        super(dict, self).__init__()
+
+        if len(set(alphabet)) != len(alphabet):
+            raise ValueError('Alphabet has duplicates!')
+
+        self.reverse = reverse
+        self.alphabet = alphabet
+        for a in alphabet:
+            for b in alphabet:
+                if not reverse:
+                    self[a, b] = alphabet[(alphabet.index(a) +
+                                           alphabet.index(b)) % len(alphabet)]
+                else:
+                    self[a, b] = alphabet[(alphabet.index(a) -
+                                           alphabet.index(b)) % len(alphabet)]
+
+    def __repr__(self):
+        if self.reverse:
+            return '%s(%r, reverse=True)' % (self.__class__.__name__,
+                                             self.alphabet)
+        else:
+            return '%s(%r)' % (self.__class__.__name__, self.alphabet)
+
 
 # Substitution ciphers
 

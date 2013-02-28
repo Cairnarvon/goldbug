@@ -407,3 +407,20 @@ These things aren't ciphers in themselves, but are used by them.
 
    :param key: a string, each character of which must appear in the alphabet.
    :param alphabet: a string of a length with an integral square root.
+
+.. class:: TabulaRecta(alphabet='abcdefghijklmnopqrstuvwxyz', reverse=False)
+
+   Constructs a tabula recta look-up from a given alphabet. For the basic Latin
+   alphabet, this looks like this:
+
+   .. image:: _static/tabula.svg
+      :alt: tabula recta
+      :align: center
+      :width: 50%
+
+   It provides a straight-forward mapping, so ``tabula['o', 'k']`` returns
+   ``'y'``.
+
+   If the *reverse* parameter is :const:`True`, a reverse look-up is provided.
+   Note that while ``tabula[a, b] == tabula[b, a]`` in the normal case, this
+   isn't true in the reversed case.
