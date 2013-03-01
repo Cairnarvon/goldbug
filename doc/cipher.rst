@@ -192,6 +192,31 @@ a **simple** substitution cipher; if it operates on groups of characters, it is
 
    :param key: a :class:`dict` mapping characters to characters.
 
+.. class:: Vigenere(key, alphabet='abcdefghijklmnopqrstuvwxyz')
+
+   The Vigenère cipher is a simple polyalphabetic substitution cipher first
+   described by Giovan Battista Bellaso in 1553, and later misattributed to
+   Blaise de Vigenère. Though it is easy to understand and implement, it often
+   appears difficult to break, earning it its nickname as *le chiffre
+   indéchiffrable*.
+
+   Its key is a word or short phrase, which is repeated for the length of the
+   plaintext. If our key is ``lemon`` and our plaintext is ``attackatdawn``,
+   this looks like this:
+
+      +---+---+---+---+---+---+---+---+---+---+---+---+
+      | l | e | m | o | n | l | e | m | o | n | l | e |
+      +---+---+---+---+---+---+---+---+---+---+---+---+
+      | a | t | t | a | c | k | a | t | d | a | w | n |
+      +---+---+---+---+---+---+---+---+---+---+---+---+
+
+   The corresponding key and plaintext characters are then looked up in a
+   :class:`TabulaRecta`, yielding a ciphertext character.
+
+   :param key: a string, all of whose characters must be present in the
+               alphabet.
+   :param alphabet: the alphabet used to construct the tabula recta.
+
 
 Transposition ciphers
 ---------------------

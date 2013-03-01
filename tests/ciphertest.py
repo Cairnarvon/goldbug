@@ -354,6 +354,36 @@ class SimpleTest(unittest.TestCase):
         self.assertEqual(repr(goldbug.cipher.Simple({'a': '!'})),
                          "Simple({'a': '!'})")
 
+class VigenereTest(unittest.TestCase):
+    def test_vigenere_encryption(self):
+        cipher = goldbug.cipher.Vigenere('lemon')
+        self.assertEqual(cipher.encrypt('attackatdawn'), 'lxfopvefrnhr')
+
+        cipher = goldbug.cipher.Vigenere('fortification')
+        self.assertEqual(cipher.encrypt('defendtheeastwallofthecastle'),
+                         'iswxvibjexiggbocewkbjeviggqs')
+
+    def test_vigenere_decryption(self):
+        cipher = goldbug.cipher.Vigenere('lemon')
+        self.assertEqual(cipher.decrypt('lxfopvefrnhr'), 'attackatdawn')
+
+        cipher = goldbug.cipher.Vigenere('fortification')
+        self.assertEqual(cipher.decrypt('iswxvibjexiggbocewkbjeviggqs'),
+                         'defendtheeastwallofthecastle')
+
+    def test_vigenere_bad(self):
+        self.assertRaises(ValueError, goldbug.cipher.Vigenere, 'ab.')
+        self.assertRaises(ValueError, goldbug.cipher.Vigenere, 'ab', '.;')
+
+        cipher = goldbug.cipher.Vigenere('test')
+        self.assertRaises(KeyError, cipher.encrypt, 'abc..def')
+
+    def test_vigenere_misc(self):
+        self.assertEqual(repr(goldbug.cipher.Vigenere('lemon')),
+                         "Vigenere('lemon')")
+        self.assertEqual(repr(goldbug.cipher.Vigenere('a', 'abcd')),
+                         "Vigenere('a', alphabet='abcd')")
+
 
 # Transposition ciphers.
 

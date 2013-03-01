@@ -418,6 +418,60 @@ class Simple(MonoalphabeticSubstitutionCipher):
         self.encrypt_mapping = self.key
         self.decrypt_mapping = dict((b, a) for (a, b) in self.key.items())
 
+class Vigenere(Cipher):
+    """
+    The Vigenere cipher is a simple polyalphabetic substitution cipher first
+    described by Giovan Battista Bellaso in 1553, and later misattributed to
+    Blaise de Vigenere. Though it is easy to understand and implement, it often
+    appears difficult to break, earning it its nickname as "le chiffre
+    indechiffrable".
+
+    Its key is a word or short phrase, which is repeated for the length of the
+    plaintext. If our key is lemon and our plaintext is attackatdawn, this
+    looks like this:
+
+        lemonlemonle
+        attackatdawn
+
+    The corresponding key and plaintext characters are then looked up in a
+    tabula recta, yielding a ciphertext character.
+    """
+    def __init__(self, key, alphabet=string.ascii_lowercase):
+        """
+        key is a short string, all of whose characters must appear in the
+        alphabet.
+        """
+        if not all(c in alphabet for c in key):
+            raise ValueError('Invalid key!')
+        self.key = key
+        self.alphabet = alphabet
+
+    def encrypt(self, text):
+        """
+        Transform plaintext into ciphertext.
+        """
+        tabula = TabulaRecta(self.alphabet)
+        return ''.join(tabula[co] for co in zip(text, self.__keystream()))
+
+    def decrypt(self, text):
+        """
+        Transform ciphertext into plaintext.
+        """
+        tabula = TabulaRecta(self.alphabet, reverse=True)
+        return ''.join(tabula[co] for co in zip(text, self.__keystream()))
+
+    def __keystream(self):
+        while True:
+            for c in self.key:
+                yield c
+
+    def __repr__(self):
+        if self.alphabet == string.ascii_lowercase:
+            return '%s(%r)' % (self.__class__.__name__, self.key)
+        else:
+            return '%s(%r, alphabet=%r)' % (self.__class__.__name__,
+                                            self.key, self.alphabet)
+
 
 # Transposition ciphers
 
