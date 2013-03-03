@@ -223,6 +223,42 @@ class CaesarTest(unittest.TestCase):
     def test_caesar_misc(self):
         self.assertEquals(repr(goldbug.cipher.Caesar(4)), 'Caesar(4)')
 
+class FourSquareTest(unittest.TestCase):
+    def test_foursquare_encryption(self):
+        cipher = goldbug.cipher.FourSquare(
+            (goldbug.cipher.Polybius('example', 'abcdefghijklmnoprstuvwxyz'),
+             goldbug.cipher.Polybius('keyword', 'abcdefghijklmnoprstuvwxyz')),
+            goldbug.cipher.Polybius('', 'abcdefghijklmnoprstuvwxyz')
+        )
+        self.assertEqual(cipher.encrypt('helpmeobiwankenobi'),
+                         'fygmkyhobxmfkkkimd')
+
+    def test_foursquare_decryption(self):
+        cipher = goldbug.cipher.FourSquare(
+            (goldbug.cipher.Polybius('example', 'abcdefghijklmnoprstuvwxyz'),
+             goldbug.cipher.Polybius('keyword', 'abcdefghijklmnoprstuvwxyz')),
+            goldbug.cipher.Polybius('', 'abcdefghijklmnoprstuvwxyz')
+        )
+        self.assertEqual(cipher.decrypt('fygmkyhobxmfkkkimd'),
+                         'helpmeobiwankenobi')
+
+    def test_foursquare_bad(self):
+        p1 = goldbug.cipher.Polybius('secret')
+        p2 = goldbug.cipher.Polybius('', 'abcd')
+        p3 = goldbug.cipher.Polybius('', 'abcdefgh', dimensions=3)
+
+        self.assertRaises(ValueError, goldbug.cipher.FourSquare, (p1, p2))
+        self.assertRaises(ValueError, goldbug.cipher.FourSquare, (p1, p1), p3)
+        self.assertRaises(ValueError, goldbug.cipher.FourSquare, (p1, p2), p3)
+
+    def test_foursquare_misc(self):
+        cipher = goldbug.cipher.FourSquare((goldbug.cipher.Polybius('secret'),
+                                            goldbug.cipher.Polybius('message')))
+        self.assertEqual(repr(cipher),
+            "FourSquare((Polybius('secret', 'abcdefghiklmnopqrstuvwxyz'), "
+            "Polybius('message', 'abcdefghiklmnopqrstuvwxyz')), "
+            "Polybius('', 'abcdefghiklmnopqrstuvwxyz'))")
+
 class KeywordTest(unittest.TestCase):
     def test_keyword_encryption(self):
         cipher = goldbug.cipher.Keyword('kryptos')

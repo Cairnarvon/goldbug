@@ -244,6 +244,97 @@ class Caesar(MonoalphabeticSubstitutionCipher):
         self.encrypt_mapping = dict(zip(string.ascii_lowercase, shifted))
         self.decrypt_mapping = dict(zip(shifted, string.ascii_lowercase))
 
+class FourSquare(Cipher):
+    """
+    The four-square cipher is a polygraphic substitution cipher by Felix
+    Delastelle.
+    It takes as its key two Polybius squares, and operates on plaintext
+    characters within the domain of a third. These squares, all of which are
+    the same size, are arranged thusly:
+
+        ALPHABET    KEY1
+        KEY2        ALPHABET
+
+    By way of a example, consider two keys Polybius('example') and
+    Polybius('keyword'), and a basic alphabet Polybius(''). Arranged, they
+    look like this:
+
+        a b c d e  e x a m p
+        f g h i k  l b c d f
+        l m n o p  g h i k n
+        q r s t u  o q r s t
+        v w x y z  u v w y z
+
+        k e y w o  a b c d e
+        r d a b c  f g h i k
+        f g h i l  l m n o p
+        m n p q s  q r s t u
+        t u v x z  v w x y z
+
+    Encryption happens by taking plaintext character in pairs, and locating
+    the first one in the top left square and the second in the bottom right
+    one. The ciphertext characters are then the characters on the other two
+    corners of the rectangle they form.
+    """
+    def __init__(self, keys, alphabet=Polybius(''), padding='x'):
+        """
+        keys must be a sequence of two Polybius squares.
+        alphabet must be a Polybius square.
+        padding must be a character in alphabet.
+        All squares must be the same size.
+        """
+        if len(keys) != 2:
+            raise ValueError('Need exactly two keys.')
+
+        if len(keys[0]) != len(keys[1]) or len(keys[0]) != len(alphabet):
+            raise ValueError('All squares must be the same size!')
+
+        if keys[0].dimensions != 2 or keys[1].dimensions != 2 or \
+           alphabet.dimensions != 2:
+            raise ValueError('All squares must be squares!')
+
+        if len(padding) != 1:
+            raise ValueError('Padding character must be character!')
+
+        if padding not in alphabet:
+            raise ValueError('Padding character must exist in alphabet!')
+
+        self.keys = keys
+        self.alphabet = alphabet
+        self.padding = padding
+
+    def encrypt(self, text):
+        """
+        Transforms plaintext into ciphertext.
+        """
+        if len(text) % 2 == 1:
+            text += self.padding
+        text = (c for c in text)
+        cipher = []
+        for a, b in zip(text, text):
+            x1, y1 = self.alphabet[a]
+            x2, y2 = self.alphabet[b]
+            cipher.append(self.keys[0][x1, y2])
+            cipher.append(self.keys[1][x2, y1])
+        return ''.join(cipher)
+
+    def decrypt(self, text):
+        """
+        Transforms ciphertext into plaintext.
+        """
+        text = (c for c in text)
+        plain = []
+        for a, b in zip(text, text):
+            x1, y1 = self.keys[0][a]
+            x2, y2 = self.keys[1][b]
+            plain.append(self.alphabet[x1, y2])
+            plain.append(self.alphabet[x2, y1])
+        return ''.join(plain)
+
+    def __repr__(self):
+        return '%s(%r, %r)' % (self.__class__.__name__,
+                               self.keys, self.alphabet)
+
 class Keyword(MonoalphabeticSubstitutionCipher):
     """
     The keyword cipher is a monoalphabetic substitution cipher using a keyword

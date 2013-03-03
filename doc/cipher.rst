@@ -99,6 +99,46 @@ a **simple** substitution cipher; if it operates on groups of characters, it is
 
    :param key: an integer, ideally between 0 and 26.
 
+.. class:: FourSquare(keys, alphabet=goldbug.cipher.Polybius(''), padding='x')
+
+   The four-square cipher is a polygraphic substitution cipher by Félix
+   Delastelle.
+
+   It takes as its key two :class:`Polybius` squares, and operates on plaintext
+   characters within the domain of a third. These squares, all of which are the
+   same size, are arranged as follows::
+
+      alphabet    key1
+      key2        alphabet
+
+   By way of example, consider two keys ``Polybius('example')`` and
+   ``Polybius('keyword')``, and a basic alphabet ``Polybius('')``. Arranged,
+   they look like this::
+
+       a b c d e  e x a m p
+       f g h i k  l b c d f
+       l m n o p  g h i k n
+       q r s t u  o q r s t
+       v w x y z  u v w y y
+
+       k e y w o  a b c d e
+       r d a b c  f g h i k
+       f g h i l  l m n o p
+       m n p q s  q r s t u
+       t u v x z  v w x y z
+
+   Encryption happens by taking plaintext characters in pairs, and locating the
+   first one in the top left quadrant and the second in the bottom right one.
+   The ciphertext characters are then the characters on the other two corners
+   of the rectangle they form. In our example, the plaintext characters **ex**,
+   for instance, would map to **az**.
+
+   Because plaintext is taken in pairs, it is padded if its length isn't even.
+
+   :param keys: a sequence of two :class:`Polybius` squares.
+   :param alphabet: a :class:`Polybius` square.
+   :param padding: a single character.
+
 .. class:: Keyword(key)
 
    The keyword cipher is a monoalphabetic substitution cipher using a keyword
