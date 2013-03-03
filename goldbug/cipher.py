@@ -800,6 +800,8 @@ class Bifid(Cipher):
         """
         if not isinstance(key, Polybius):
             key = Polybius('', key)
+        if key.dimensions != 2:
+            raise ValueError('Polybius instance must be square!')
         self.polybius = key
         self.period = int(period)
 
