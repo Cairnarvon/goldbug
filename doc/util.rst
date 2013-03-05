@@ -126,6 +126,38 @@ Text characterisation
 Other utilities
 ---------------
 
+.. class:: Matrix(matrix=None, size=None)
+
+   A class representing a matrix, intended for use with
+   :class:`goldbug.cipher.Hill`. It supports most operations you'd expect:
+   addition (scalar and matrix), multiplication (scalar and matrix), modulo
+   (scalar), raising to positive integral powers, and inversion modulo an
+   integer (with the :func:`pow` builtin function). It doesn't support generic
+   inversion, and provides no way for calculating the determinant.
+
+      >>> m = goldbug.util.Matrix([[1, 2], [3, 4]])
+      >>> m + m
+      Matrix([[2, 4], [6, 8]])
+      >>> m * m
+      Matrix([[7, 10], [15, 22]])
+      >>> m ** 3
+      Matrix([[37, 54], [81, 118]])
+      >>> m * m == m ** 2
+      True
+      >>> pow(m, -1, 7)
+      Matrix([[5, 1], [5, 3]])
+      >>> m[1, 0]
+      3
+      >>> m[1, 1] = 8
+      >>> m
+      Matrix([[1, 2], [3, 8]])
+      >>> m % 3
+      Matrix([[1, 2], [0, 2]])
+
+   :param matrix: a sequence of rows; if omitted, *size* must be specified.
+   :param size: an integer (for a square matrix) or a tuple of integers
+                representing a null matrix's dimensions.
+
 .. function:: egcd(a, b)
 
    This function implements the extended Euclidean algorithm. It returns a tuple
