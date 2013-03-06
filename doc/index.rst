@@ -22,11 +22,20 @@ This package was named after E. A. Poe's short story, `The Gold-Bug`_.
 Contents
 --------
 
+API reference
+^^^^^^^^^^^^^
+
 .. toctree::
-   :maxdepth: 2
 
    cipher
    analysis
    freq
    util
 
+Other
+^^^^^
+
+.. toctree::
+   :maxdepth: 2
+
+   exercises
