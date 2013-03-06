@@ -177,6 +177,25 @@ class HillTest(unittest.TestCase):
             "Hill(Matrix([[1, 2], [3, 4]]), alphabet='abcde')"
         )
 
+class HomophonicTest(unittest.TestCase):
+    def test_homophonic_encryption(self):
+        d = goldbug.util.RandomDict({'a': '12', 'b': '34'})
+        cipher = goldbug.cipher.Homophonic(d)
+        self.assertTrue(cipher.encrypt('ab') in ('13', '14', '23', '24'))
+
+    def test_homophonic_decryption(self):
+        d = goldbug.util.RandomDict({'a': '12', 'b': '34'})
+        cipher = goldbug.cipher.Homophonic(d)
+        self.assertEqual(cipher.decrypt('13'), 'ab')
+        self.assertEqual(cipher.decrypt('14'), 'ab')
+        self.assertEqual(cipher.decrypt('23'), 'ab')
+        self.assertEqual(cipher.decrypt('24'), 'ab')
+
+    def test_homophonic_misc(self):
+        d = goldbug.util.RandomDict({'a': '12', 'b': '34'})
+        self.assertEqual(repr(goldbug.cipher.Homophonic(d)),
+                         'Homophonic(%r)' % d)
+
 class KeywordTest(unittest.TestCase):
     def test_keyword_encryption(self):
         cipher = goldbug.cipher.Keyword('kryptos')
@@ -302,7 +321,7 @@ class SimpleTest(unittest.TestCase):
                          'zyxwvutsrqponmlkjihgfedcba')
 
     def test_simple_bad(self):
-        self.assertRaises(TypeError, goldbug.cipher.Simple, 14)
+        self.assertRaises(AttributeError, goldbug.cipher.Simple, 14)
 
     def test_simple_misc(self):
         self.assertEqual(repr(goldbug.cipher.Simple({'a': '!'})),

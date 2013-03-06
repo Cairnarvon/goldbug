@@ -219,6 +219,27 @@ a **simple** substitution cipher; if it operates on groups of characters, it is
                alphabet.
    :param alphabet: a string with no repeated characters.
 
+.. class:: Homophonic(key)
+
+   The homophonic substitution cipher is a simple substitution cipher that can
+   map plaintext symbols to more than one ciphertext symbol, at random. This
+   makes frequency analysis much harder.
+
+   This class is just an alias for :class:`goldbug.cipher.Simple`; pass it a
+   :class:`goldbug.util.RandomDict` to make it behave like a homophonic cipher.
+
+      >>> d = goldbug.util.RandomDict({'a': ['y', '1', 'x'], 'b': ['?'], 'c': ['a', '&', 'e']})
+      >>> goldbug.cipher.Homophonic(d).encrypt('aababcabbcc')
+      'y1?1?a1??ea'
+      >>> goldbug.analysis.ic('aababcabbcc')
+      7.0909090909090908
+      >>> goldbug.analysis.ic('y1?1?a1??ea')
+      4.333333333333333
+
+   Remember that :class:`Simple` preserves plaintext characters that aren't in
+   its dictionary; if you want decryption to yield your original plaintext,
+   be careful about that plaintext's characters *vis à vis* your mapping.
+
 .. class:: Keyword(key)
 
    The keyword cipher is a monoalphabetic substitution cipher using a keyword
@@ -310,7 +331,9 @@ a **simple** substitution cipher; if it operates on groups of characters, it is
    If you're using Python 2.x, remember to pass :class:`unicode` objects if
    your alphabet isn't ASCII.
 
-   :param key: a :class:`dict` mapping characters to characters.
+   :param key: a :class:`dict` mapping characters to characters. If you pass
+               in a :class:`goldbug.cipher.RandomDict`, you get a
+               :class:`Homophonic` cipher instead.
 
 .. class:: Vigenere(key, alphabet='abcdefghijklmnopqrstuvwxyz')
 

@@ -91,8 +91,9 @@ Classes
 
    If you pass an instance of :class:`RandomDict` as a key to
    :class:`goldbug.cipher.Simple`, it turns it from a simple substitution
-   cipher into a homophonic substitution cipher, which is much less vulnerable
-   to frequency analysis.
+   cipher into a homophonic substitution cipher
+   (:class:`goldbug.cipher.Homophonic`), which is much less vulnerable to
+   frequency analysis.
 
    Note that this class doesn't implement every method :class:`dict` has.
    Specifically, it implements the following:

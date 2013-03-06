@@ -482,9 +482,19 @@ class Simple(MonoalphabeticSubstitutionCipher):
         """
         key: a dict mapping characters to other characters.
         """
-        self.key = dict(key)
+        self.key = key
         self.encrypt_mapping = self.key
         self.decrypt_mapping = dict((b, a) for (a, b) in self.key.items())
+
+class Homophonic(Simple):
+    """
+    The homophonic substitution cipher can match plaintext characters to any
+    of a number of ciphertext characters.
+
+    This class is just an alias for goldbug.cipher.Simple; pass it a
+    goldbug.util.RandomDict instead of a normal dictionary to make it behave
+    as a homophonic cipher.
+    """
 
 class Vigenere(Cipher):
     """
