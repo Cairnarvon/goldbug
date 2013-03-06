@@ -26,6 +26,7 @@ Contents
    :maxdepth: 2
 
    cipher
+   analysis
    freq
    util
 

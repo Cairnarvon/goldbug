@@ -19,11 +19,13 @@ doczip: doc/index.rst doc/conf.py
 tests:
 	@echo "\033[33;1mPython 2 tests\033[0m"
 	python tests/ciphertest.py
+	python tests/analysistest.py
 	python tests/freqtest.py
 	python tests/utiltest.py
 	@echo
 	@echo "\033[33;1mPython 3 tests\033[0m"
 	python3 tests/ciphertest.py
+	python3 tests/analysistest.py
 	python3 tests/freqtest.py
 	python3 tests/utiltest.py
 

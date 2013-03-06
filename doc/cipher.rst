@@ -99,14 +99,14 @@ a **simple** substitution cipher; if it operates on groups of characters, it is
 
    :param key: an integer, ideally between 0 and 26.
 
-.. class:: FourSquare(keys, alphabet=goldbug.cipher.Polybius(''), padding='x')
+.. class:: FourSquare(keys, alphabet=goldbug.util.Polybius(''), padding='x')
 
    The four-square cipher is a polygraphic substitution cipher by Félix
    Delastelle.
 
-   It takes as its key two :class:`Polybius` squares, and operates on plaintext
-   characters within the domain of a third. These squares, all of which are the
-   same size, are arranged as follows::
+   It takes as its key two :class:`goldbug.util.Polybius` squares, and operates
+   on plaintext characters within the domain of a third. These squares, all of
+   which are the same size, are arranged as follows::
 
       alphabet    key1
       key2        alphabet
@@ -135,8 +135,8 @@ a **simple** substitution cipher; if it operates on groups of characters, it is
 
    Because plaintext is taken in pairs, it is padded if its length isn't even.
 
-   :param keys: a sequence of two :class:`Polybius` squares.
-   :param alphabet: a :class:`Polybius` square.
+   :param keys: a sequence of two :class:`goldbug.util.Polybius` squares.
+   :param alphabet: a :class:`goldbug.util.Polybius` square.
    :param padding: a single character.
 
 .. class:: Hill(key, alphabet='abcdefghijklmnopqrstuvwxyz')
@@ -243,8 +243,8 @@ a **simple** substitution cipher; if it operates on groups of characters, it is
    The Playfair is a monoalphabetic digraph substitution cipher invented by
    Charles Wheatstone in 1854 and popularised by Lord Playfair.
 
-   It uses a :class:`Polybius` square with a key to map digraphs (that is,
-   groups of two letters) to other digraphs in the following way:
+   It uses a Polybius square with a key to map digraphs (that is, groups of two
+   letters) to other digraphs in the following way:
 
    #. If the two letters are the same, insert an `x` (the :const:`breaker`
       parameter) between them and encrypt the new initial digraph.
@@ -261,10 +261,10 @@ a **simple** substitution cipher; if it operates on groups of characters, it is
    If necessary, the plaintext is padded with a `z` (the :const:`padding`
    parameter) to ensure it is of even length.
 
-   Because a :class:`Polybius` square only has room for 25 letters, one letter
-   must be discarded; this is the :const:`omitted` parameter. By default,
-   occurences of the letter `j` in the plaintext are mapped to `i`. Another
-   common option is to discard the letter `q` entirely (`{'q': ''}`).
+   Because a Polybius square only has room for 25 letters, one letter must be
+   discarded; this is the :const:`omitted` parameter. By default, occurences of
+   the letter `j` in the plaintext are mapped to `i`. Another common option is
+   to discard the letter `q` entirely (`{'q': ''}`).
 
    :param key: a string.
    :param breaker: a single letter.
@@ -331,7 +331,7 @@ a **simple** substitution cipher; if it operates on groups of characters, it is
       +---+---+---+---+---+---+---+---+---+---+---+---+
 
    The corresponding key and plaintext characters are then looked up in a
-   :class:`TabulaRecta`, yielding a ciphertext character.
+   :class:`goldbug.util.TabulaRecta`, yielding a ciphertext character.
 
    :param key: a string, all of whose characters must be present in the
                alphabet.
@@ -425,7 +425,7 @@ exotic going on that makes them difficult to classify.
 
    The bifid cipher was invented around 1901 by Félix Delastelle, and was
    notable in that it combined fractionated substitution with transposition by
-   way of a :class:`Polybius` square.
+   way of a :class:`goldbug.util.Polybius` square.
 
    To demonstrate, let's use the following square as the key:
 
@@ -490,7 +490,8 @@ exotic going on that makes them difficult to classify.
    Longer messages are usually broken up into smaller chunks. The length of
    these chunks is called the **period** of the cipher.
 
-   :param key: a :class:`Polybius` square, or a string used to construct one.
+   :param key: a :class:`goldbug.util.Polybius` square, or a string used to
+               construct one.
    :param period: an integer; if non-positive, text will be encrypted and
                   decrypted whole.
 
@@ -498,8 +499,7 @@ exotic going on that makes them difficult to classify.
 
    The trifid cipher is another cipher by Félix Delastelle. It extends the
    :class:`Bifid` cipher into the third dimension; where the bifid cipher uses
-   a :class:`Polybius` square as the key, the trifid cipher uses an Polybius
-   cube.
+   a Polybius *square* as the key, the trifid cipher uses a Polybius cube.
 
    Though the cube's side is canonically 3, allowing for a 27-character
    alphabet (usually the 26 letters and the period), this implementation allows
@@ -508,64 +508,8 @@ exotic going on that makes them difficult to classify.
    Other than dealing with three coordinates instead of two, the trifid cipher
    works in essentially the same way as the bifid cipher.
 
-   :param key: a :class:`Polybius` cube (that is, **dimensions=3**), or a string
-               of a length with an integral cube root (1, 8, 27, etc.) and no
-               repeated characters.
+   :param key: a :class:`goldbug.util.Polybius` cube (that is,
+               **dimensions=3**), or a string of a length with an integral cube
+               root (1, 8, 27, etc.) and no repeated characters.
    :param period: an integer; if non-positive, text will be encrypted and
                   decrypted whole.
-
-
-Miscellaneous
--------------
-
-These things aren't ciphers in themselves, but are used by them.
-
-.. class:: Polybius(key, alphabet='abcdefghiklmnopqrstuvwxyz', dimensions=2)
-
-   This is a generalisation of the Polybius square or checkerboard to arbitrary
-   (integral, positive) dimensions.
-
-   The traditional Polybius square maps an alphabet onto a checkboard, possibly
-   with the help of a key. It isn't particularly useful on its own, but it's
-   used by several classical ciphers.
-
-   This implementation generalises that and can map an alphabet to a square
-   (the default), a cube, or any hypercube. It provides a :class:`dict`-like
-   mapping from characters to coordinate tuples and vice versa.
-
-   For dimensions lower than 3, it converts to a string nicely:
-
-      >>> from goldbug.cipher import Polybius
-      >>> kana = 'いろはにほへとちりぬるをわかよたれそつねならむうゐのおくやまけふこえてあさきゆめみしゑひもせすん。'
-      >>> uesugi = Polybius('', kana)
-      >>> print(uesugi)
-      い ろ は に ほ へ と
-      ち り ぬ る を わ か
-      よ た れ そ つ ね な
-      ら む う ゐ の お く
-      や ま け ふ こ え て
-      あ さ き ゆ め み し
-      ゑ ひ も せ す ん 。
-
-   If you're using Python 2.x, remember to pass :class:`unicode` objects if
-   your key and alphabet aren't ASCII.
-
-   :param key: a string, each character of which must appear in the alphabet.
-   :param alphabet: a string of a length with an integral square root.
-
-.. class:: TabulaRecta(alphabet='abcdefghijklmnopqrstuvwxyz', reverse=False)
-
-   Constructs a tabula recta look-up from a given alphabet. For the basic Latin
-   alphabet, this looks like this:
-
-   .. image:: _static/tabula.svg
-      :alt: tabula recta
-      :align: center
-      :width: 50%
-
-   It provides a straight-forward mapping, so ``tabula['o', 'k']`` returns
-   ``'y'``.
-
-   If the *reverse* parameter is :const:`True`, a reverse look-up is provided.
-   Note that while ``tabula[a, b] == tabula[b, a]`` in the normal case, this
-   isn't true in the reversed case.

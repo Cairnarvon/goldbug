@@ -1,7 +1,8 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
+# coding=utf8
 
 """
-Utilities for studying and breaking classical ciphers.
+Utilities for use with classical ciphers.
 """
 
 import collections
@@ -162,49 +163,109 @@ class Matrix(object):
     def __repr__(self):
         return '%s(%r)' % (self.__class__.__name__, self.values)
 
-def frequency_analysis(text, ngram=1):
+class Polybius(dict):
     """
-    Generates an n-gram frequency table from a source text.
-    """
-    freqs, total = collections.defaultdict(int), 0
-    for i in range(len(text) - ngram + 1):
-        freqs[text[i:i + ngram]] += 1
-        total += 1
-    for gram in freqs:
-        freqs[gram] /= float(total)
-    return dict(freqs)
+    A representation of a Polybius square.
 
-def chi2(text, freqs):
+    This automatically constructs a square out of a key and an alphabet, and
+    exposes a mapping from letters to (row, column) tuples and vice versa.
     """
-    Performs Pearson's chi-squared test on a potential plaintext with respect
-    to a given frequency table. Lower numbers are better.
-    freqs should be a table from goldbug.freq.*; for instance, to perform the
-    test with respect to English unigrams, use goldbug.freq.english.unigram.
-    """
-    acc = 0
-    for c in freqs:
-        e_i = freqs[c] * len(text) / len(c) # Expected incidence
-        c_i = text.count(c)                 # Observed incidence
-        if e_i == 0.0 and c_i == 0:
-            continue
-        elif e_i == 0.0:
-            acc += float('inf')
+    def __init__(self, key, alphabet='abcdefghiklmnopqrstuvwxyz', dimensions=2):
+        """
+        All key characters must occur in the alphabet.
+        """
+        super(dict, self).__init__()
+
+        self.key = key
+        self.alphabet = alphabet
+
+        # Get rid of duplicate characters in key.
+        k = []
+        for c in key:
+            if c not in k:
+                k.append(c)
+        key = ''.join(k)
+
+        # Alphabet isn't allowed to have duplicates at all.
+        if len(set(alphabet)) != len(alphabet):
+            raise ValueError('Alphabet is not a set!')
+
+        # All key characters should occur in the alphabet.
+        if not all(c in alphabet for c in key):
+            raise ValueError('Invalid key!')
+
+        # Keep track of contents for convenience.
+        if alphabet:
+            key = ''.join(c for c in key if c in alphabet)
+        self.contents = key + ''.join(c for c in alphabet if c not in key)
+
+        self.dimensions = int(dimensions)
+        if self.dimensions < 1:
+            raise ValueError('Dimension must be positive!')
+
+        # We don't need to be 5×5, but we do need to be regular.
+        self.side = int(round(len(self.contents) ** (1.0 / self.dimensions)))
+        if self.side ** self.dimensions != len(self.contents):
+            raise ValueError("Can't map key + alphabet onto a square!")
+
+        # We need a mapping from letters to row/col numbers...
+        for n, c in enumerate(self.contents):
+            self[c] = self.__index_to_coordinate(n)
+
+        # ... and vice versa.
+        for k in list(self.keys()):
+            self[self[k]] = k
+
+    def __index_to_coordinate(self, index):
+        co, the_index = (), index
+        for i in range(self.dimensions):
+            quo, rem = divmod(index, self.side)
+            co = (rem,) + co
+            index = quo
+        if index != 0:
+            raise OverflowError('Index %d is out of range!' % the_index)
+        return co
+
+    def __repr__(self):
+        return '%s(%r, %r)' % (self.__class__.__name__, self.key, self.alphabet)
+
+    def __str__(self):
+        if self.dimensions == 1:
+            return self[0,]
+        elif self.dimensions == 2:
+            return '\n'.join(' '.join(self[(r, c)] for c in range(self.side))
+                             for r in range(self.side))
         else:
-            acc += (c_i - e_i)**2 / e_i
-    return acc
+            return repr(self)
 
-def ic(text, alphabet=string.ascii_lowercase):
+class TabulaRecta(dict):
     """
-    Calculates the monographic index of coincidence for a given piece of text.
+    A representation of the tabula recta for a given alphabet.
     """
-    text = [c for c in text if c in alphabet]
-    if len(text) < 2:
-        raise ValueError('Text is too short!')
-    ic = 0
-    for c in alphabet:
-        fi = text.count(c)
-        ic += fi * (fi - 1)
-    return ic / (len(text) * (len(text) - 1) / float(len(alphabet)))
+    def __init__(self, alphabet=string.ascii_lowercase, reverse=False):
+        super(dict, self).__init__()
+
+        if len(set(alphabet)) != len(alphabet):
+            raise ValueError('Alphabet has duplicates!')
+
+        self.reverse = reverse
+        self.alphabet = alphabet
+        for a in alphabet:
+            for b in alphabet:
+                if not reverse:
+                    self[a, b] = alphabet[(alphabet.index(a) +
+                                           alphabet.index(b)) % len(alphabet)]
+                else:
+                    self[a, b] = alphabet[(alphabet.index(a) -
+                                           alphabet.index(b)) % len(alphabet)]
+
+    def __repr__(self):
+        if self.reverse:
+            return '%s(%r, reverse=True)' % (self.__class__.__name__,
+                                             self.alphabet)
+        else:
+            return '%s(%r)' % (self.__class__.__name__, self.alphabet)
+
 
 def egcd(a, b):
     """

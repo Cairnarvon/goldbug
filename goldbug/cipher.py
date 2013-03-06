@@ -33,109 +33,6 @@ class Cipher(object):
     def __repr__(self):
         return '%s(%r)' % (self.__class__.__name__, self.key)
 
-class Polybius(dict):
-    """
-    A representation of a Polybius square.
-
-    This automatically constructs a square out of a key and an alphabet, and
-    exposes a mapping from letters to (row, column) tuples and vice versa.
-    """
-    def __init__(self, key, alphabet='abcdefghiklmnopqrstuvwxyz', dimensions=2):
-        """
-        All key characters must occur in the alphabet.
-        """
-        super(dict, self).__init__()
-
-        self.key = key
-        self.alphabet = alphabet
-
-        # Get rid of duplicate characters in key.
-        k = []
-        for c in key:
-            if c not in k:
-                k.append(c)
-        key = ''.join(k)
-
-        # Alphabet isn't allowed to have duplicates at all.
-        if len(set(alphabet)) != len(alphabet):
-            raise ValueError('Alphabet is not a set!')
-
-        # All key characters should occur in the alphabet.
-        if not all(c in alphabet for c in key):
-            raise ValueError('Invalid key!')
-
-        # Keep track of contents for convenience.
-        if alphabet:
-            key = ''.join(c for c in key if c in alphabet)
-        self.contents = key + ''.join(c for c in alphabet if c not in key)
-
-        self.dimensions = int(dimensions)
-        if self.dimensions < 1:
-            raise ValueError('Dimension must be positive!')
-
-        # We don't need to be 5×5, but we do need to be regular.
-        self.side = int(round(len(self.contents) ** (1.0 / self.dimensions)))
-        if self.side ** self.dimensions != len(self.contents):
-            raise ValueError("Can't map key + alphabet onto a square!")
-
-        # We need a mapping from letters to row/col numbers...
-        for n, c in enumerate(self.contents):
-            self[c] = self.__index_to_coordinate(n)
-
-        # ... and vice versa.
-        for k in list(self.keys()):
-            self[self[k]] = k
-
-    def __index_to_coordinate(self, index):
-        co, the_index = (), index
-        for i in range(self.dimensions):
-            quo, rem = divmod(index, self.side)
-            co = (rem,) + co
-            index = quo
-        if index != 0:
-            raise OverflowError('Index %d is out of range!' % the_index)
-        return co
-
-    def __repr__(self):
-        return '%s(%r, %r)' % (self.__class__.__name__, self.key, self.alphabet)
-
-    def __str__(self):
-        if self.dimensions == 1:
-            return self[0,]
-        elif self.dimensions == 2:
-            return '\n'.join(' '.join(self[(r, c)] for c in range(self.side))
-                             for r in range(self.side))
-        else:
-            return repr(self)
-
-class TabulaRecta(dict):
-    """
-    A representation of the tabula recta for a given alphabet.
-    """
-    def __init__(self, alphabet=string.ascii_lowercase, reverse=False):
-        super(dict, self).__init__()
-
-        if len(set(alphabet)) != len(alphabet):
-            raise ValueError('Alphabet has duplicates!')
-
-        self.reverse = reverse
-        self.alphabet = alphabet
-        for a in alphabet:
-            for b in alphabet:
-                if not reverse:
-                    self[a, b] = alphabet[(alphabet.index(a) +
-                                           alphabet.index(b)) % len(alphabet)]
-                else:
-                    self[a, b] = alphabet[(alphabet.index(a) -
-                                           alphabet.index(b)) % len(alphabet)]
-
-    def __repr__(self):
-        if self.reverse:
-            return '%s(%r, reverse=True)' % (self.__class__.__name__,
-                                             self.alphabet)
-        else:
-            return '%s(%r)' % (self.__class__.__name__, self.alphabet)
-
 
 # Substitution ciphers
 
@@ -276,7 +173,7 @@ class FourSquare(Cipher):
     one. The ciphertext characters are then the characters on the other two
     corners of the rectangle they form.
     """
-    def __init__(self, keys, alphabet=Polybius(''), padding='x'):
+    def __init__(self, keys, alphabet=util.Polybius(''), padding='x'):
         """
         keys must be a sequence of two Polybius squares.
         alphabet must be a Polybius square.
@@ -475,7 +372,7 @@ class Playfair(MonoalphabeticSubstitutionCipher):
         key = ''.join(c for c in key.lower() if c in self.alphabet)
 
         # Construct the Polybius square.
-        self.polybius = Polybius(key, self.alphabet)
+        self.polybius = util.Polybius(key, self.alphabet)
 
     # Playfair is a monoalphabetic substitution cipher, but because it
     # works with bigrams rather than individual letters, we can't reuse
@@ -621,14 +518,14 @@ class Vigenere(Cipher):
         """
         Transform plaintext into ciphertext.
         """
-        tabula = TabulaRecta(self.alphabet)
+        tabula = util.TabulaRecta(self.alphabet)
         return ''.join(tabula[co] for co in zip(text, self.__keystream()))
 
     def decrypt(self, text):
         """
         Transform ciphertext into plaintext.
         """
-        tabula = TabulaRecta(self.alphabet, reverse=True)
+        tabula = util.TabulaRecta(self.alphabet, reverse=True)
         return ''.join(tabula[co] for co in zip(text, self.__keystream()))
 
     def __keystream(self):
@@ -878,8 +775,8 @@ class Bifid(Cipher):
         key should be a string or a Polybius square.
         period should be an integer; non-positive not to use one.
         """
-        if not isinstance(key, Polybius):
-            key = Polybius('', key)
+        if not isinstance(key, util.Polybius):
+            key = util.Polybius('', key)
         if key.dimensions != 2:
             raise ValueError('Polybius instance must be square!')
         self.polybius = key
@@ -957,8 +854,8 @@ class Trifid(Bifid):
         period is an integer; if not positive, texts aren't divided into
         blocks.
         """
-        if not isinstance(key, Polybius):
-            key = Polybius('', key, 3)
+        if not isinstance(key, util.Polybius):
+            key = util.Polybius('', key, 3)
         if key.dimensions != 3:
             raise ValueError('Key must be a Polybius cube!')
         self.polybius = key

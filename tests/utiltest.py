@@ -8,29 +8,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 import goldbug
 
-class FreqAnalTest(unittest.TestCase):
-    def test_freqanal(self):
-        self.assertEqual(goldbug.util.frequency_analysis("mississipi", 1),
-                         {'m': 1. / 10, 'i': 4. / 10,
-                          's': 4. / 10, 'p': 1. / 10})
-        self.assertEqual(goldbug.util.frequency_analysis("mississipi", 2),
-                         {'mi': 1. / 9, 'is': 2. / 9, 'ss': 2. / 9,
-                          'si': 2. / 9, 'ip': 1. / 9, 'pi': 1. / 9})
-        self.assertEqual(goldbug.util.frequency_analysis("mississipi", 3),
-                         {'mis': 1. / 8, 'iss': 2. / 8, 'ssi': 2. / 8,
-                          'sis': 1. / 8, 'sip': 1. / 8, 'ipi': 1. / 8})
-        self.assertEqual(goldbug.util.frequency_analysis("mississipi", 9),
-                         {'mississip': 1. / 2, 'ississipi': 1. / 2})
-        self.assertEqual(goldbug.util.frequency_analysis("mississipi", 10),
-                         {'mississipi': 1})
-        self.assertEqual(goldbug.util.frequency_analysis("mississipi", 11),
-                         {})
-
-class Chi2Test(unittest.TestCase):
-    def test_chi2(self):
-        self.assertEqual(goldbug.util.chi2('aaa', {'a': 1}), 0.0)
-        self.assertEqual(goldbug.util.chi2('aaa', {'a': 0}), float('inf'))
-
 class MMITest(unittest.TestCase):
     def test_egcd(self):
         self.assertEqual(goldbug.util.egcd(120, 23), (1, -9, 47))
@@ -41,12 +18,6 @@ class MMITest(unittest.TestCase):
         self.assertEqual(goldbug.util.mmi(5, 26), 21)
 
         self.assertRaises(ValueError, goldbug.util.mmi, 2, 4)
-
-class ICTest(unittest.TestCase):
-    def test_ic(self):
-        self.assertEqual(goldbug.util.ic('abcdefghijklmnopqrstuvwxyz'), 0.0)
-        self.assertAlmostEqual(goldbug.util.ic('something or other'), 1.5166667)
-        self.assertRaises(ValueError, goldbug.util.ic, '')
 
 class MatrixTest(unittest.TestCase):
     def test_matrix_constructor(self):
@@ -131,6 +102,113 @@ class MatrixTest(unittest.TestCase):
                          'Matrix([[1, 2], [3, 4]])')
         self.assertEqual(repr(goldbug.util.Matrix(size=3)),
                          'Matrix([[0, 0, 0], [0, 0, 0], [0, 0, 0]])')
+
+class PolybiusTest(unittest.TestCase):
+    def test_polybius(self):
+        p = goldbug.util.Polybius('')
+        self.assertEqual(p[(0, 0)], 'a')
+        self.assertEqual(p[(0, 1)], 'b')
+        self.assertEqual(p[(1, 0)], 'f')
+        self.assertEqual(p[(4, 4)], 'z')
+
+        self.assertEqual(p['a'], (0, 0))
+        self.assertEqual(p['b'], (0, 1))
+        self.assertEqual(p['f'], (1, 0))
+        self.assertEqual(p['z'], (4, 4))
+
+        p = goldbug.util.Polybius('keyword')
+        self.assertEqual(p[(0, 0)], 'k')
+        self.assertEqual(p['e'], (0, 1))
+
+        p = goldbug.util.Polybius('', 'abcd')
+        self.assertEqual(p[(0, 0)], 'a')
+        self.assertEqual(p[(0, 1)], 'b')
+        self.assertEqual(p['c'], (1, 0))
+        self.assertEqual(p['d'], (1, 1))
+
+        p = goldbug.util.Polybius('', 'abcdefghijklmnopqrstuvwxyz.', 3)
+        self.assertEqual(p[0, 0, 0], 'a')
+        self.assertEqual(p[2, 2, 2], '.')
+        self.assertEqual(p['b'], (0, 0, 1))
+        self.assertEqual(p['z'], (2, 2, 1))
+
+        p = goldbug.util.Polybius('', '.', 1)
+        self.assertEqual(p[(0,)], '.')
+        self.assertEqual(p['.'], (0,))
+
+    def test_polybius_str(self):
+        p = goldbug.util.Polybius('', 'abcd')
+        self.assertEqual(str(p), 'a b\nc d')
+
+        p = goldbug.util.Polybius('d', 'd')
+        self.assertEqual(str(p), 'd')
+
+        p = goldbug.util.Polybius('', '.', 1)
+        self.assertEqual(str(p), '.')
+
+        p = goldbug.util.Polybius('', 'abcdefghijklmnopqrstuvwxyz.', 3)
+        self.assertEqual(str(p), repr(p))
+
+    def test_polybius_bad(self):
+        self.assertRaises(ValueError, goldbug.util.Polybius, '', 'ab')
+        self.assertRaises(ValueError, goldbug.util.Polybius, '.')
+        self.assertRaises(ValueError, goldbug.util.Polybius, '', 'abcc')
+
+        p = goldbug.util.Polybius('key')
+        self.assertRaises(KeyError, p.__getitem__, '!')
+        self.assertRaises(KeyError, p.__getitem__, (6, 6))
+        self.assertRaises(OverflowError, p._Polybius__index_to_coordinate, 25)
+
+        self.assertRaises(ValueError, goldbug.util.Polybius, '', dimensions=0)
+        self.assertRaises(ValueError, goldbug.util.Polybius, '', dimensions=-1)
+        self.assertRaises(ValueError, goldbug.util.Polybius, '', 'abcd', 3)
+
+    def test_polybius_misc(self):
+        p = goldbug.util.Polybius('key')
+        self.assertEqual(p._Polybius__index_to_coordinate(0), (0, 0))
+        self.assertEqual(p._Polybius__index_to_coordinate(1), (0, 1))
+        self.assertEqual(p._Polybius__index_to_coordinate(2), (0, 2))
+        self.assertEqual(p._Polybius__index_to_coordinate(5), (1, 0))
+        self.assertEqual(p._Polybius__index_to_coordinate(24), (4, 4))
+
+        p = goldbug.util.Polybius('', 'abcdefghijklmnopqrstuvwxyz.', 3)
+        self.assertEqual(p._Polybius__index_to_coordinate(0), (0, 0, 0))
+        self.assertEqual(p._Polybius__index_to_coordinate(1), (0, 0, 1))
+        self.assertEqual(p._Polybius__index_to_coordinate(2), (0, 0, 2))
+        self.assertEqual(p._Polybius__index_to_coordinate(3), (0, 1, 0))
+        self.assertEqual(p._Polybius__index_to_coordinate(9), (1, 0, 0))
+        self.assertEqual(p._Polybius__index_to_coordinate(26), (2, 2, 2))
+
+        p = goldbug.util.Polybius('', '.', 1)
+        self.assertEqual(p._Polybius__index_to_coordinate(0), (0,))
+
+class TabulaRectaTest(unittest.TestCase):
+    def test_tabula(self):
+        tabula = goldbug.util.TabulaRecta()
+        self.assertEqual(tabula['a', 'a'], 'a')
+        self.assertEqual(tabula['a', 'b'], 'b')
+        self.assertEqual(tabula['b', 'a'], 'b')
+        self.assertEqual(tabula['k', 'o'], 'y')
+
+        tabula = goldbug.util.TabulaRecta(reverse=True)
+        self.assertEqual(tabula['a', 'a'], 'a')
+        self.assertEqual(tabula['b', 'b'], 'a')
+        self.assertEqual(tabula['a', 'b'], 'z')
+        self.assertEqual(tabula['y', 'o'], 'k')
+
+        tabula = goldbug.util.TabulaRecta('abcd')
+        for a in 'abcd':
+            for b in 'abcd':
+                self.assertEqual(tabula[a, b], tabula[b, a])
+
+    def test_tabula_bad(self):
+        self.assertRaises(ValueError, goldbug.util.TabulaRecta, 'abcda')
+
+    def test_tabula_misc(self):
+        self.assertEqual(repr(goldbug.util.TabulaRecta()),
+                         "TabulaRecta('abcdefghijklmnopqrstuvwxyz')")
+        self.assertEqual(repr(goldbug.util.TabulaRecta('abc', True)),
+                         "TabulaRecta('abc', reverse=True)")
 
 if __name__ == '__main__':
     unittest.main()

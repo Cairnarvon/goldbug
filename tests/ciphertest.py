@@ -9,115 +9,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 import goldbug
 
-
-class PolybiusTest(unittest.TestCase):
-    def test_polybius(self):
-        p = goldbug.cipher.Polybius('')
-        self.assertEqual(p[(0, 0)], 'a')
-        self.assertEqual(p[(0, 1)], 'b')
-        self.assertEqual(p[(1, 0)], 'f')
-        self.assertEqual(p[(4, 4)], 'z')
-
-        self.assertEqual(p['a'], (0, 0))
-        self.assertEqual(p['b'], (0, 1))
-        self.assertEqual(p['f'], (1, 0))
-        self.assertEqual(p['z'], (4, 4))
-
-        p = goldbug.cipher.Polybius('keyword')
-        self.assertEqual(p[(0, 0)], 'k')
-        self.assertEqual(p['e'], (0, 1))
-
-        p = goldbug.cipher.Polybius('', 'abcd')
-        self.assertEqual(p[(0, 0)], 'a')
-        self.assertEqual(p[(0, 1)], 'b')
-        self.assertEqual(p['c'], (1, 0))
-        self.assertEqual(p['d'], (1, 1))
-
-        p = goldbug.cipher.Polybius('', 'abcdefghijklmnopqrstuvwxyz.', 3)
-        self.assertEqual(p[0, 0, 0], 'a')
-        self.assertEqual(p[2, 2, 2], '.')
-        self.assertEqual(p['b'], (0, 0, 1))
-        self.assertEqual(p['z'], (2, 2, 1))
-
-        p = goldbug.cipher.Polybius('', '.', 1)
-        self.assertEqual(p[(0,)], '.')
-        self.assertEqual(p['.'], (0,))
-
-    def test_polybius_str(self):
-        p = goldbug.cipher.Polybius('', 'abcd')
-        self.assertEqual(str(p), 'a b\nc d')
-
-        p = goldbug.cipher.Polybius('d', 'd')
-        self.assertEqual(str(p), 'd')
-
-        p = goldbug.cipher.Polybius('', '.', 1)
-        self.assertEqual(str(p), '.')
-
-        p = goldbug.cipher.Polybius('', 'abcdefghijklmnopqrstuvwxyz.', 3)
-        self.assertEqual(str(p), repr(p))
-
-    def test_polybius_bad(self):
-        self.assertRaises(ValueError, goldbug.cipher.Polybius, '', 'ab')
-        self.assertRaises(ValueError, goldbug.cipher.Polybius, '.')
-        self.assertRaises(ValueError, goldbug.cipher.Polybius, '', 'abcc')
-
-        p = goldbug.cipher.Polybius('key')
-        self.assertRaises(KeyError, p.__getitem__, '!')
-        self.assertRaises(KeyError, p.__getitem__, (6, 6))
-        self.assertRaises(OverflowError, p._Polybius__index_to_coordinate, 25)
-
-        self.assertRaises(ValueError, goldbug.cipher.Polybius, '', dimensions=0)
-        self.assertRaises(ValueError, goldbug.cipher.Polybius, '', dimensions=-1)
-        self.assertRaises(ValueError, goldbug.cipher.Polybius, '', 'abcd', 3)
-
-    def test_polybius_misc(self):
-        p = goldbug.cipher.Polybius('key')
-        self.assertEqual(p._Polybius__index_to_coordinate(0), (0, 0))
-        self.assertEqual(p._Polybius__index_to_coordinate(1), (0, 1))
-        self.assertEqual(p._Polybius__index_to_coordinate(2), (0, 2))
-        self.assertEqual(p._Polybius__index_to_coordinate(5), (1, 0))
-        self.assertEqual(p._Polybius__index_to_coordinate(24), (4, 4))
-
-        p = goldbug.cipher.Polybius('', 'abcdefghijklmnopqrstuvwxyz.', 3)
-        self.assertEqual(p._Polybius__index_to_coordinate(0), (0, 0, 0))
-        self.assertEqual(p._Polybius__index_to_coordinate(1), (0, 0, 1))
-        self.assertEqual(p._Polybius__index_to_coordinate(2), (0, 0, 2))
-        self.assertEqual(p._Polybius__index_to_coordinate(3), (0, 1, 0))
-        self.assertEqual(p._Polybius__index_to_coordinate(9), (1, 0, 0))
-        self.assertEqual(p._Polybius__index_to_coordinate(26), (2, 2, 2))
-
-        p = goldbug.cipher.Polybius('', '.', 1)
-        self.assertEqual(p._Polybius__index_to_coordinate(0), (0,))
-
-class TabulaRectaTest(unittest.TestCase):
-    def test_tabula(self):
-        tabula = goldbug.cipher.TabulaRecta()
-        self.assertEqual(tabula['a', 'a'], 'a')
-        self.assertEqual(tabula['a', 'b'], 'b')
-        self.assertEqual(tabula['b', 'a'], 'b')
-        self.assertEqual(tabula['k', 'o'], 'y')
-
-        tabula = goldbug.cipher.TabulaRecta(reverse=True)
-        self.assertEqual(tabula['a', 'a'], 'a')
-        self.assertEqual(tabula['b', 'b'], 'a')
-        self.assertEqual(tabula['a', 'b'], 'z')
-        self.assertEqual(tabula['y', 'o'], 'k')
-
-        tabula = goldbug.cipher.TabulaRecta('abcd')
-        for a in 'abcd':
-            for b in 'abcd':
-                self.assertEqual(tabula[a, b], tabula[b, a])
-
-    def test_tabula_bad(self):
-        self.assertRaises(ValueError, goldbug.cipher.TabulaRecta, 'abcda')
-
-    def test_tabula_misc(self):
-        self.assertEqual(repr(goldbug.cipher.TabulaRecta()),
-                         "TabulaRecta('abcdefghijklmnopqrstuvwxyz')")
-        self.assertEqual(repr(goldbug.cipher.TabulaRecta('abc', True)),
-                         "TabulaRecta('abc', reverse=True)")
-
-
 # Substitution ciphers
 
 class AffineTest(unittest.TestCase):
@@ -226,34 +117,34 @@ class CaesarTest(unittest.TestCase):
 class FourSquareTest(unittest.TestCase):
     def test_foursquare_encryption(self):
         cipher = goldbug.cipher.FourSquare(
-            (goldbug.cipher.Polybius('example', 'abcdefghijklmnoprstuvwxyz'),
-             goldbug.cipher.Polybius('keyword', 'abcdefghijklmnoprstuvwxyz')),
-            goldbug.cipher.Polybius('', 'abcdefghijklmnoprstuvwxyz')
+            (goldbug.util.Polybius('example', 'abcdefghijklmnoprstuvwxyz'),
+             goldbug.util.Polybius('keyword', 'abcdefghijklmnoprstuvwxyz')),
+            goldbug.util.Polybius('', 'abcdefghijklmnoprstuvwxyz')
         )
         self.assertEqual(cipher.encrypt('helpmeobiwankenobi'),
                          'fygmkyhobxmfkkkimd')
 
     def test_foursquare_decryption(self):
         cipher = goldbug.cipher.FourSquare(
-            (goldbug.cipher.Polybius('example', 'abcdefghijklmnoprstuvwxyz'),
-             goldbug.cipher.Polybius('keyword', 'abcdefghijklmnoprstuvwxyz')),
-            goldbug.cipher.Polybius('', 'abcdefghijklmnoprstuvwxyz')
+            (goldbug.util.Polybius('example', 'abcdefghijklmnoprstuvwxyz'),
+             goldbug.util.Polybius('keyword', 'abcdefghijklmnoprstuvwxyz')),
+            goldbug.util.Polybius('', 'abcdefghijklmnoprstuvwxyz')
         )
         self.assertEqual(cipher.decrypt('fygmkyhobxmfkkkimd'),
                          'helpmeobiwankenobi')
 
     def test_foursquare_bad(self):
-        p1 = goldbug.cipher.Polybius('secret')
-        p2 = goldbug.cipher.Polybius('', 'abcd')
-        p3 = goldbug.cipher.Polybius('', 'abcdefgh', dimensions=3)
+        p1 = goldbug.util.Polybius('secret')
+        p2 = goldbug.util.Polybius('', 'abcd')
+        p3 = goldbug.util.Polybius('', 'abcdefgh', dimensions=3)
 
         self.assertRaises(ValueError, goldbug.cipher.FourSquare, (p1, p2))
         self.assertRaises(ValueError, goldbug.cipher.FourSquare, (p1, p1), p3)
         self.assertRaises(ValueError, goldbug.cipher.FourSquare, (p1, p2), p3)
 
     def test_foursquare_misc(self):
-        cipher = goldbug.cipher.FourSquare((goldbug.cipher.Polybius('secret'),
-                                            goldbug.cipher.Polybius('message')))
+        cipher = goldbug.cipher.FourSquare((goldbug.util.Polybius('secret'),
+                                            goldbug.util.Polybius('message')))
         self.assertEqual(repr(cipher),
             "FourSquare((Polybius('secret', 'abcdefghiklmnopqrstuvwxyz'), "
             "Polybius('message', 'abcdefghiklmnopqrstuvwxyz')), "
@@ -551,7 +442,7 @@ class BifidTest(unittest.TestCase):
         cipher = goldbug.cipher.Bifid('bgwkzqpndsioaxefclumthyvr')
         self.assertEqual(cipher.encrypt('fleeatonce'), 'uaeolwrins')
 
-        poly = goldbug.cipher.Polybius('bgwkzqpndsioaxefclumthyvr')
+        poly = goldbug.util.Polybius('bgwkzqpndsioaxefclumthyvr')
         self.assertEqual(goldbug.cipher.Bifid(poly).encrypt('anything'),
                          cipher.encrypt('anything'))
 
@@ -563,7 +454,7 @@ class BifidTest(unittest.TestCase):
         cipher = goldbug.cipher.Bifid('bgwkzqpndsioaxefclumthyvr')
         self.assertEqual(cipher.decrypt('uaeolwrins'), 'fleeatonce')
 
-        poly = goldbug.cipher.Polybius('bgwkzqpndsioaxefclumthyvr')
+        poly = goldbug.util.Polybius('bgwkzqpndsioaxefclumthyvr')
         self.assertEqual(goldbug.cipher.Bifid(poly).decrypt('anything'),
                          cipher.decrypt('anything'))
 
@@ -580,7 +471,7 @@ class BifidTest(unittest.TestCase):
         self.assertEqual(repr(goldbug.cipher.Bifid('bgwkzqpndsioaxefclumthyvr')),
                          "Bifid('bgwkzqpndsioaxefclumthyvr')")
 
-        poly = goldbug.cipher.Polybius('bgwkzqpndsioaxefclumthyvr')
+        poly = goldbug.util.Polybius('bgwkzqpndsioaxefclumthyvr')
         self.assertEqual(repr(goldbug.cipher.Bifid(poly)),
                          "Bifid('bgwkzqpndsioaxefclumthyvr')")
 
@@ -607,7 +498,7 @@ class TrifidTest(unittest.TestCase):
     def test_trifid_bad(self):
         self.assertRaises(ValueError, goldbug.cipher.Trifid, 'ab', 3)
         self.assertRaises(ValueError, goldbug.cipher.Trifid,
-                          goldbug.cipher.Polybius('', 'abcd'), 2)
+                          goldbug.util.Polybius('', 'abcd'), 2)
 
         cipher = goldbug.cipher.Trifid('abcdefgh', 3)
         self.assertRaises(KeyError, cipher.decrypt, 'ijklm')
