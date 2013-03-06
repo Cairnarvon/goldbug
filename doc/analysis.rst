@@ -16,47 +16,6 @@ Text characterisation
    a given frequency table. If the distributions are similar, the returned
    number will be lower.
 
-   A practical example, using chi-squared to help break the Caesar cipher
-   through brute force:
-
-      >>> import goldbug
-      >>> from goldbug.freq.english import unigram
-      >>> ciphertext = 'sjsfmhvwbuksgsscfgssawgpihorfsoakwhvwborfsoa'
-      >>> candidates = {}
-      >>> for i in range(26):
-      ...     plaintext = goldbug.cipher.Caesar(i).decrypt(ciphertext)
-      ...     candidates[plaintext] = goldbug.util.chi2(plaintext, unigram)
-      ...
-      >>> for candidate in sorted(candidates, key=candidates.__getitem__):
-      ...    print('%8.2f %s' % (candidates[candidate], candidate))
-      ...
-         17.16 everythingweseeorseemisbutadreamwithinadream
-         82.28 sjsfmhvwbuksgsscfgssawgpihorfsoakwhvwborfsoa
-        156.45 ofobidrsxqgocooybcoowscledknbokwgsdrsxknbokw
-        184.40 aranupdejcsaoaaknoaaieoxqpwznawisepdejwznawi
-        225.78 gxgtavjkpiyguggqtuggokudwvcftgcoykvjkpcftgco
-        226.57 pgpcjestyrhpdppzcdppxtdmfelocplxhtestylocplx
-        254.46 lclyfaopundlzllvyzlltpzibahkylhtdpaopuhkylht
-        264.26 ypylsnbchaqymyyilmyygcmvonuxlyugqcnbchuxlyug
-        270.74 tktgniwxcvlthttdghttbxhqjipsgtpblxiwxcpsgtpb
-        273.57 hyhubwklqjzhvhhruvhhplvexwdguhdpzlwklqdguhdp
-        312.80 nenahcqrwpfnbnnxabnnvrbkdcjmanjvfrcqrwjmanjv
-        323.04 fwfszuijohxftffpstffnjtcvubesfbnxjuijobesfbn
-        333.77 ctcpwrfgleucqccmpqcckgqzsrybpcykugrfglybpcyk
-        362.96 rirelguvatjrfrrbefrrzvfohgnqernzjvguvanqernz
-        380.29 izivcxlmrkaiwiisvwiiqmwfyxehvieqamxlmrehvieq
-        383.42 wnwjqlzafyowkwwgjkwweaktmlsvjwseoalzafsvjwse
-        564.93 uluhojxydwmuiuuehiuucyirkjqthuqcmyjxydqthuqc
-        601.25 bsbovqefkdtbpbblopbbjfpyrqxaobxjtfqefkxaobxj
-        610.28 vmvipkyzexnvjvvfijvvdzjslkruivrdnzkyzeruivrd
-        641.31 kbkxeznotmckykkuxykksoyhazgjxkgscoznotgjxkgs
-        725.27 dudqxsghmfvdrddnqrddlhratszcqdzlvhsghmzcqdzl
-        756.01 mdmzgbpqvoemammwzammuqajcbilzmiueqbpqvilzmiu
-        991.86 jajwdymnslbjxjjtwxjjrnxgzyfiwjfrbnymnsfiwjfr
-       1049.16 xoxkrmabgzpxlxxhklxxfblunmtwkxtfpbmabgtwkxtf
-       1689.16 zqzmtocdibrznzzjmnzzhdnwpovymzvhrdocdivymzvh
-       1877.85 qhqdkftuzsiqeqqadeqqyuengfmpdqmyiuftuzmpdqmy
-
    Note that this function can return :const:`inf` if the text contains a
    character or sequence the frequency table claims has a probability of 0
    for a text of the given length.
