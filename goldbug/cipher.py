@@ -335,6 +335,86 @@ class FourSquare(Cipher):
         return '%s(%r, %r)' % (self.__class__.__name__,
                                self.keys, self.alphabet)
 
+class Hill(Cipher):
+    """
+    The Hill cipher is a polygraphic substitution cipher based on matrix
+    operations, designed by Lester S. Hill in 1929.
+
+    Each letter of the key, plaintext, and ciphertext is represented as a
+    number in some way; for instance, a=0, b=1, etc. The key is written as
+    a square matrix. For instance, if our key is "ddcf":
+
+        3 3
+        2 5
+
+    The plaintext is broken up into chunks of a length equal to the key
+    matrix's side, and written as a column matrix. The key matrix and the
+    plaintext matrix are then multiplied modulo the length of the alphabet to
+    yield the ciphertext. For instance, if our message is "help":
+
+        3 3 * 7 = 7 (H)
+        2 5   4   8 (I)
+
+        3 3 * 11 = 0 (A)
+        2 5   15   19 (T)
+
+    Our ciphertext is then "hiat".
+
+    Decryption is the same process, only using the inverse of the key matrix
+    modulo the length of the alphabet. This inverse doesn't exist for every
+    matrix, so choose your key with care.
+    """
+    def __init__(self, key, alphabet=string.ascii_lowercase):
+        """
+        key must be an instance of goldbug.util.Matrix, invertible modulo the
+        alphabet length, or a string to be translated into one.
+        alphabet must not have any repeated characters.
+        """
+        if len(set(alphabet)) != len(alphabet):
+            raise ValueError('Invalid alphabet!')
+        self.alphabet = alphabet
+        self.modulus = len(alphabet)
+
+        if not isinstance(key, util.Matrix):
+            w = int(round(len(key) ** .5))
+            if w * w != len(key):
+                raise ValueError("Key can't be transformed into square matrix!")
+            key = [self.alphabet.index(c) for c in key]
+            key = util.Matrix([key[i:i + w] for i in range(0, len(key), w)])
+        self.key = key % self.modulus
+        self.invkey = pow(key, -1, self.modulus)
+
+    def encrypt(self, text):
+        """
+        Transforms plaintext into ciphertext.
+        """
+        cipher = []
+        for i in range(0, len(text), self.key.rows):
+            chunk = util.Matrix(list(zip(self.alphabet.index(c)
+                                         for c in text[i:i + self.key.rows])))
+            m = self.key * chunk % self.modulus
+            cipher.extend([self.alphabet[c] for c in m.col(0)])
+        return ''.join(cipher)
+
+    def decrypt(self, text):
+        """
+        Transforms ciphertext into plaintext.
+        """
+        plain = []
+        for i in range(0, len(text), self.invkey.rows):
+            chunk = util.Matrix(list(zip(self.alphabet.index(c)
+                                         for c in text[i:i + self.invkey.rows])))
+            m = self.invkey * chunk % self.modulus
+            plain.extend([self.alphabet[c] for c in m.col(0)])
+        return ''.join(plain)
+
+    def __repr__(self):
+        if self.alphabet == string.ascii_lowercase:
+            return '%s(%r)' % (self.__class__.__name__, self.key)
+        else:
+            return '%s(%r, alphabet=%r)' % (self.__class__.__name__,
+                                            self.key, self.alphabet)
+
 class Keyword(MonoalphabeticSubstitutionCipher):
     """
     The keyword cipher is a monoalphabetic substitution cipher using a keyword

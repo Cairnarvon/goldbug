@@ -139,6 +139,86 @@ a **simple** substitution cipher; if it operates on groups of characters, it is
    :param alphabet: a :class:`Polybius` square.
    :param padding: a single character.
 
+.. class:: Hill(key, alphabet='abcdefghijklmnopqrstuvwxyz')
+
+   The Hill cipher is a polygraphic substitution cipher based on matrix
+   operations, designed by Lester S. Hill in 1929.
+
+   Each letter of our key and plaintext may be represented as a number in some
+   fixed way; for instance, *a* becomes 0, *b* becomes 1, etc. For encryption,
+   the key is written as a square matrix; for example, if our key is ``ddcf``:
+
+   .. math::
+
+      \left( \begin{array}{cc}
+      3 & 3 \\
+      2 & 5
+      \end{array} \right)
+
+   Our plaintext is broken up into chunks of a length equal to the key
+   matrix's side, and written as column matrices. Each of these matrices is
+   multiplied with the key matrix to yield the ciphertext. If our plaintext is
+   ``help``:
+
+   .. math::
+
+      \left( \begin{array}{cc}
+      3 & 3 \\
+      2 & 5
+      \end{array} \right)
+      \left( \begin{array}{c}
+      7 \\
+      4
+      \end{array} \right)
+      =
+      \left( \begin{array}{c}
+      7 \\
+      8
+      \end{array} \right) \mod 26
+      =
+      h i
+
+      \left( \begin{array}{cc}
+      3 & 3 \\
+      2 & 5
+      \end{array} \right)
+      \left( \begin{array}{c}
+      11 \\
+      15
+      \end{array} \right)
+      =
+      \left( \begin{array}{c}
+      0 \\
+      19
+      \end{array} \right) \mod 26
+      =
+      a t
+
+   So our ciphertext is ``hiat``.
+
+   Decryption is the same thing, only using the inverse of the key matrix
+   modulo the length of the alphabet. This inverse doesn't exist for every
+   matrix, so choose your key with care (:class:`Hill` will raise a
+   :class:`ValueError` if you try to construct it with a key that can't be
+   inverted).
+
+   For our example, the inverse matrix is the following:
+
+   .. math::
+
+      \left( \begin{array}{cc}
+      15 & 17 \\
+      20 & 9
+      \end{array} \right)
+
+   Multiplying it by the ciphertext column matrices obtained earlier will
+   yield the original plaintext column matrices.
+
+   :param key: an instance of :class:`goldbug.util.Matrix` or a string to be
+               used to create one, invertible modulo the length of the
+               alphabet.
+   :param alphabet: a string with no repeated characters.
+
 .. class:: Keyword(key)
 
    The keyword cipher is a monoalphabetic substitution cipher using a keyword

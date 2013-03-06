@@ -259,6 +259,33 @@ class FourSquareTest(unittest.TestCase):
             "Polybius('message', 'abcdefghiklmnopqrstuvwxyz')), "
             "Polybius('', 'abcdefghiklmnopqrstuvwxyz'))")
 
+class HillTest(unittest.TestCase):
+    def test_hill_encryption(self):
+        cipher = goldbug.cipher.Hill(goldbug.util.Matrix([[3, 3], [2, 5]]))
+        self.assertEqual(cipher.encrypt('help'), 'hiat')
+
+    def test_hill_decryption(self):
+        cipher = goldbug.cipher.Hill(goldbug.util.Matrix([[3, 3], [2, 5]]))
+        self.assertEqual(cipher.decrypt('hiat'), 'help')
+
+    def test_hill_bad(self):
+        self.assertRaises(TypeError, goldbug.cipher.Hill, 1)
+        self.assertRaises(ValueError, goldbug.cipher.Hill,
+                          goldbug.util.Matrix(((1, 2), (3, 4))), 'abcdd')
+
+    def test_hill_misc(self):
+        self.assertEqual(goldbug.cipher.Hill('ddcf').key,
+                         goldbug.util.Matrix([[3, 3], [2, 5]]))
+        self.assertEqual(
+            repr(goldbug.cipher.Hill(goldbug.util.Matrix(((3, 3), (2, 5))))),
+            'Hill(Matrix([[3, 3], [2, 5]]))'
+        )
+        self.assertEqual(
+            repr(goldbug.cipher.Hill(goldbug.util.Matrix(((1, 2), (3, 4))),
+                                     'abcde')),
+            "Hill(Matrix([[1, 2], [3, 4]]), alphabet='abcde')"
+        )
+
 class KeywordTest(unittest.TestCase):
     def test_keyword_encryption(self):
         cipher = goldbug.cipher.Keyword('kryptos')
