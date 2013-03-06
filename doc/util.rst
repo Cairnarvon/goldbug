@@ -108,3 +108,12 @@ Functions
    This function computes the multiplicative inverse of *a* modulo *m*,
    raising a :class:`ValueError` if *a* is not prime relative to *m* (and
    the multiplicative inverse therefore doesn't exist).
+
+.. function:: textgen(alphabet='abcdefghijklmnopqrstuvwxyz', min_length=0, max_length=None)
+
+   A generator generating all strings it is possible to form with a given
+   alphabet, of length *min_length* through length *max_length* (or forever if
+   that's :const:`None`).
+
+      >>> list(goldbug.util.textgen('abc', max_length=2))
+      ['', 'a', 'b', 'c', 'aa', 'ab', 'ac', 'ba', 'bb', 'bc', 'ca', 'cb', 'cc']

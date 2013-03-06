@@ -210,5 +210,31 @@ class TabulaRectaTest(unittest.TestCase):
         self.assertEqual(repr(goldbug.util.TabulaRecta('abc', True)),
                          "TabulaRecta('abc', reverse=True)")
 
+class TextgenTest(unittest.TestCase):
+    def test_textgen(self):
+        self.assertEqual(list(goldbug.util.textgen('abcd', 0, 2)),
+                         ['', 'a', 'b', 'c', 'd',
+                          'aa', 'ab', 'ac', 'ad',
+                          'ba', 'bb', 'bc', 'bd',
+                          'ca', 'cb', 'cc', 'cd',
+                          'da', 'db', 'dc', 'dd'])
+        self.assertEqual(list(goldbug.util.textgen('ba', 3, 3)),
+                         ['bbb', 'bba', 'bab', 'baa',
+                          'abb', 'aba', 'aab', 'aaa'])
+        self.assertEqual(len(list(goldbug.util.textgen('1234', 8, 8))), 4 ** 8)
+
+    def test_types(self):
+        self.assertEqual(type(next(goldbug.util.textgen('abc'))), type('abc'))
+        if hasattr('', 'decode'):
+            # Python 2
+            self.assertTrue(isinstance(
+                next(goldbug.util.textgen('abcd'.decode('utf8'))),
+                unicode
+            ))
+        else:
+            # Python 3
+            self.assertRaises(TypeError, next,
+                              goldbug.util.textgen('abcd'.encode('utf8')))
+
 if __name__ == '__main__':
     unittest.main()

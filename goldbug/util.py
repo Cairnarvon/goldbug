@@ -288,3 +288,27 @@ def mmi(a, m):
     if g != 1:
         raise ValueError('%d is not prime relative to %d!' % (a, m))
     return x % m
+
+def textgen(alphabet=string.ascii_lowercase, min_length=0, max_length=None):
+    """
+    Generates all possible strings formable with the given alphabet, from
+    length min_length to max_length (or forever if max_length isn't given).
+    """
+    n = [0] * min_length
+    while True:
+        # Convert n into a string.
+        yield type(alphabet)('').join([alphabet[c] for c in reversed(n)])
+
+        # Increment.
+        i = 0
+        while True:
+            if i == len(n):
+                n.append(-1)
+                if max_length is not None and len(n) > max_length:
+                    return
+            n[i] += 1
+            if n[i] == len(alphabet):
+                n[i] = 0
+                i += 1
+            else:
+                break
