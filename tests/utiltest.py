@@ -236,5 +236,16 @@ class TextgenTest(unittest.TestCase):
             self.assertRaises(TypeError, next,
                               goldbug.util.textgen('abcd'.encode('utf8')))
 
+class RandomDictTest(unittest.TestCase):
+    def test_randomdict(self):
+        d = goldbug.util.RandomDict({'a': [1, 2, 3], 'b': [4, 5], 'c': [6]})
+        self.assertTrue(d['a'] in (1, 2, 3))
+        self.assertTrue(d['b'] in (4, 5))
+        self.assertEqual(d['c'], 6)
+
+        d = goldbug.util.RandomDict(a="abc", b="de", c="fghi", d="j")
+        a_items = [item[1] for item in d.items() if item[0] == 'a']
+        self.assertEqual(sorted(a_items), ['a', 'b', 'c'])
+
 if __name__ == '__main__':
     unittest.main()

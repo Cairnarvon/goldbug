@@ -6,6 +6,7 @@ Utilities for use with classical ciphers.
 """
 
 import collections
+import random
 import string
 
 
@@ -237,6 +238,49 @@ class Polybius(dict):
                              for r in range(self.side))
         else:
             return repr(self)
+
+class RandomDict(object):
+    """
+    A dictionary that can return one of several values for a given key, at
+    random.
+
+        >>> d = RandomDict({'a': [1, 2, 3], 'b': [4], 'c': [5, 6]})
+        >>> d['a']
+        2
+        >>> d['a']
+        1
+        >>> d['b']
+        4
+    """
+    def __init__(self, dictionary=None, **kwargs):
+        """
+        Same constructor as dict, except that each value must be a sequence.
+        """
+        if dictionary is not None:
+            self.dict = dict(dictionary)
+        else:
+            self.dict = dict(**kwargs)
+
+    def __getitem__(self, key):
+        return random.choice(self.dict[key])
+
+    def get(self, key, default=None):
+        if key in self.dict:
+            return self[key]
+        else:
+            return default
+
+    def iteritems(self):
+        if hasattr(self.dict, 'iteritems'):
+            items = self.dict.iteritems()
+        else:
+            items = self.dict.items()
+        for key, value in items:
+            for v in value:
+                yield (key, v)
+
+    def items(self):
+        return list(self.iteritems())
 
 class TabulaRecta(dict):
     """

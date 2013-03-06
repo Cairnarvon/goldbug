@@ -75,6 +75,51 @@ Classes
    :param key: a string, each character of which must appear in the alphabet.
    :param alphabet: a string of a length with an integral square root.
 
+.. class:: RandomDict(dictionary=None, **kwargs)
+
+   This is a dictionary that can return one of several values for each given
+   key, at random. It's constructed in the same way ordinary :class:`dict`
+   objects are constructed, except that each key must be a sequence.
+
+      >>> d = goldbug.util.RandomDict(a=[1, 2, 3], b=[4], c=[5, 6])
+      >>> d['a']
+      3
+      >>> d['a']
+      1
+      >>> d['b']
+      4
+
+   If you pass an instance of :class:`RandomDict` as a key to
+   :class:`goldbug.cipher.Simple`, it turns it from a simple substitution
+   cipher into a homophonic substitution cipher, which is much less vulnerable
+   to frequency analysis.
+
+   Note that this class doesn't implement every method :class:`dict` has.
+   Specifically, it implements the following:
+
+   .. function:: __getitem__(key)
+
+      As described above. This method uses :func:`random.choice` to select the
+      value it returns, and will raise a :class:`KeyError` if the key is not
+      present in the dictionary.
+
+   .. function:: get(key, default=None)
+
+      As :func:`__getitem__`, except that it returns *default* if *key* isn't
+      present in the dictionary.
+
+   .. function:: items
+
+      This returns a list of *(key, value)* tuples. If a key can match to
+      multiple values, it will appear in this list multiple times.
+
+         >>> goldbug.util.RandomDict(a=[1, 2, 3], b=[4], c=[5, 6]).items()
+         [('a', 1), ('a', 2), ('a', 3), ('c', 5), ('c', 6), ('b', 4)]
+
+   .. function:: iteritems
+
+      As :func:`items`, except an iterator.
+
 .. class:: TabulaRecta(alphabet='abcdefghijklmnopqrstuvwxyz', reverse=False)
 
    Constructs a tabula recta look-up from a given alphabet. For the basic Latin
