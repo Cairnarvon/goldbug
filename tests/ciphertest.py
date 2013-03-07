@@ -196,6 +196,28 @@ class HomophonicTest(unittest.TestCase):
         self.assertEqual(repr(goldbug.cipher.Homophonic(d)),
                          'Homophonic(%r)' % d)
 
+class KamaSutraTest(unittest.TestCase):
+    def test_kamasutra_encryption(self):
+        cipher = goldbug.cipher.KamaSutra('vqajflymsbckuhzdxtenorpwig')
+        self.assertEqual(cipher.encrypt('More than a sex manual.'),
+                         'Omsl fvdy d rlj odygde.')
+
+    def test_kamasutra_decryption(self):
+        cipher = goldbug.cipher.KamaSutra('vqajflymsbckuhzdxtenorpwig')
+        self.assertEqual(cipher.decrypt('Omsl fvdy d rlj odygde.'),
+                         'More than a sex manual.')
+
+    def test_kamasutra_invariant(self):
+        cipher = goldbug.cipher.KamaSutra('abcdefghijklmnopqrstuvwxyz')
+        self.assertEqual(cipher.encrypt('whatever'), cipher.decrypt('whatever'))
+
+        cipher = goldbug.cipher.KamaSutra('')
+        self.assertEqual(cipher.encrypt('whatever'), 'whatever')
+
+    def test_kamasutra_misc(self):
+        self.assertEqual(repr(goldbug.cipher.KamaSutra('abcdefgh')),
+                         "KamaSutra('abcdefgh')")
+
 class KeywordTest(unittest.TestCase):
     def test_keyword_encryption(self):
         cipher = goldbug.cipher.Keyword('kryptos')

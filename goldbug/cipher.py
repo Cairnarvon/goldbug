@@ -312,6 +312,33 @@ class Hill(Cipher):
             return '%s(%r, alphabet=%r)' % (self.__class__.__name__,
                                             self.key, self.alphabet)
 
+class KamaSutra(MonoalphabeticSubstitutionCipher):
+    """
+    The Kama Sutra cipher is an early substitution cipher described in the
+    Kama Sutra. It is also known as the Vatsyayana cipher, after its
+    purported author.
+
+    Its key is a permutation of the alphabet. This permutation is written
+    in two rows, and each plaintext character is replaced with the
+    corresponding character in the other row.
+    For example, if our key is 'vqajflymsbckuhzdxtenorpwig':
+
+        v q a j f l y m s b c k u
+        h z d x t e n o r p w i g
+
+    v is replaced with h, e is replace with l, etc.
+    Decryption is the exact same process.
+    """
+    def __init__(self, key):
+        """
+        key is an ordered permutation of the alphabet.
+        """
+        self.key = key
+        self.encrypt_mapping = {}
+        for i in range(len(key)):
+            self.encrypt_mapping[key[i]] = key[(i + len(key) // 2) % len(key)]
+        self.decrypt_mapping = self.encrypt_mapping
+
 class Keyword(MonoalphabeticSubstitutionCipher):
     """
     The keyword cipher is a monoalphabetic substitution cipher using a keyword

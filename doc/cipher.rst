@@ -240,6 +240,29 @@ a **simple** substitution cipher; if it operates on groups of characters, it is
    its dictionary; if you want decryption to yield your original plaintext,
    be careful about that plaintext's characters *vis à vis* your mapping.
 
+.. class:: KamaSutra(key)
+
+   The Kama Sutra cipher is a early simple substitution cipher described in
+   the 45th chapter of the Kama Sutra. It is also known as the Vātsyāyana
+   cipher, after the Kama Sutra's purported author.
+
+   Its key is a permutation of some alphabet. This permutation is written in
+   two rows, and each plaintext character is replaced with the corresponding
+   character in the other rows.
+
+   For instance, if our key is ``bzjklpqvwmraunchysexdotgif``:
+
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+
+      | b | z | j | k | l | p | q | v | w | m | r | a | u |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+
+      | n | c | h | y | s | e | x | d | o | t | g | i | f |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+   *b* gets turned into *n*, *c* gets turned into *z*, etc. Decryption is the
+   exact same process as encryption.
+
+   :param key: a permutation of the alphabet.
+
 .. class:: Keyword(key)
 
    The keyword cipher is a monoalphabetic substitution cipher using a keyword
