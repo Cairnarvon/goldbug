@@ -577,6 +577,31 @@ class Vigenere(Cipher):
             return '%s(%r, alphabet=%r)' % (self.__class__.__name__,
                                             self.key, self.alphabet)
 
+class Autokey(Vigenere):
+    """
+    The autokey or autoclave cipher is a variation on the Vigenere cipher in
+    which, rather than repeating the key for the length of the plaintext, the
+    plaintext is appended to the key.
+    """
+    def encrypt(self, text):
+        """
+        Transform plaintext into ciphertext.
+        """
+        tabula = util.TabulaRecta(self.alphabet)
+        return ''.join(tabula[co] for co in zip(text, self.key + text))
+
+    def decrypt(self, text):
+        """
+        Transform ciphertext into plaintext.
+        """
+        tabula = util.TabulaRecta(self.alphabet, reverse=True)
+        key = list(self.key)
+        plain = []
+        for i in range(len(text)):
+            c = tabula[text[i], key[i]]
+            plain.append(c)
+            key.append(c)
+        return ''.join(plain)
 
 # Transposition ciphers
 

@@ -87,6 +87,16 @@ a **simple** substitution cipher; if it operates on groups of characters, it is
 
    :param alphabet: the ordered alphabet to use.
 
+.. class:: Autokey(key, alphabet='abcdefghijklmnopqrstuvwxyz')
+
+   The autokey or autoclave cipher is a variation on the :class:`Vigenere`
+   cipher, in which, rather than repeating the key indefinitely, the plaintext
+   is appended to the key.
+
+   Blaise de Vigenère's own version of this cipher used a single letter as the
+   key; this implementation allows keywords of arbitrary length (greater than
+   zero).
+
 .. class:: Caesar(key)
 
    The Caesar cipher, also known as the shift cipher or Caesar shift, is a

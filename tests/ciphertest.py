@@ -71,6 +71,19 @@ class AtbashTest(unittest.TestCase):
         self.assertEqual(repr(goldbug.cipher.Atbash('abc')),
                          "Atbash(alphabet='abc')")
 
+class AutokeyTest(unittest.TestCase):
+    def test_autokey_encryption(self):
+        cipher = goldbug.cipher.Autokey('queenly')
+        self.assertEqual(cipher.encrypt('attackatdawn'), 'qnxepvytwtwp')
+
+    def test_autokey_decryption(self):
+        cipher = goldbug.cipher.Autokey('queenly')
+        self.assertEqual(cipher.decrypt('qnxepvytwtwp'), 'attackatdawn')
+
+    def test_autokey_misc(self):
+        self.assertEqual(repr(goldbug.cipher.Autokey('queenly')),
+                         "Autokey('queenly')")
+
 class CaesarTest(unittest.TestCase):
     def test_caesar_encryption(self):
         cipher = goldbug.cipher.Caesar(3)
