@@ -523,6 +523,63 @@ class Homophonic(Simple):
     as a homophonic cipher.
     """
 
+class TwoSquare(Cipher):
+    """
+    The two-square cipher, also called double Playfair, uses two Polybius
+    squares compared to four-square's four. It arranges them horizontally or
+    vertically, and transforms plaintext pairs into ciphertext pairs in the
+    same way as four-square, with the exception that if they're on the same
+    column (vertical arrangement) or row (horizontal arrangement), they are
+    preserved.
+    """
+    def __init__(self, keys, horizontal=False):
+        """
+        keys: two Polybius squares sharing an alphabet.
+        The squares are arranged vertically unless horizontal is True.
+        """
+        if set(keys[0].contents) != set(keys[1].contents):
+            raise ValueError('Polybius squares must share an alphabet!')
+        self.keys = keys
+        self.horizontal = bool(horizontal)
+
+    def encrypt(self, text):
+        """
+        Transforms plaintext into ciphertext.
+        """
+        lastchar = text[-1] if len(text) % 2 == 1 else ''
+        text = (c for c in text)
+        cipher = []
+        for a, b in zip(text, text):
+            r1, c1 = self.keys[0][a]
+            r2, c2 = self.keys[1][b]
+
+            if self.horizontal:
+                if r1 == r2:
+                    cipher.append(a)
+                    cipher.append(b)
+                else:
+                    cipher.append(self.keys[0][r2, c1])
+                    cipher.append(self.keys[1][r1, c2])
+            else:
+                if c1 == c2:
+                    cipher.append(a)
+                    cipher.append(b)
+                else:
+                    cipher.append(self.keys[0][r1, c2])
+                    cipher.append(self.keys[1][r2, c1])
+        cipher.append(lastchar)
+        return ''.join(cipher)
+
+    def decrypt(self, text):
+        """
+        Transforms ciphertext into plaintext.
+        """
+        return self.encrypt(text)
+
+    def __repr__(self):
+        return '%s(%r, horizontal=%r)' % (self.__class__.__name__,
+                                          self.keys, self.horizontal)
+
 class Vigenere(Cipher):
     """
     The Vigenere cipher is a simple polyalphabetic substitution cipher first

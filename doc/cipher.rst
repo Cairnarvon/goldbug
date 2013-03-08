@@ -368,6 +368,25 @@ a **simple** substitution cipher; if it operates on groups of characters, it is
                in a :class:`goldbug.cipher.RandomDict`, you get a
                :class:`Homophonic` cipher instead.
 
+.. class:: TwoSquare(keys, horizontal=False)
+
+   The two-square cipher, also called the double Playfair, is a compromise
+   between :class:`Playfair` and :class:`FourSquare`, using two Polybius
+   squares instead of one or four.
+
+   The squares are arranged either horizontally or vertically, and character of
+   the plaintext are taken in pairs and looked up as with the four-square
+   cipher. If the characters are on the same row (in the horizontal arrangement)
+   or column (in the vertical), they are preserved in the ciphertext.
+
+   Two-square is a reciprocal cipher: encryption and decryption are the same
+   process.
+
+   :param keys: two instances of :class:`goldbug.util.Polybius`, sharing the
+                same alphabet.
+   :param horizontal: the squares are arranged vertically unless this is
+                      :const:`True`.
+
 .. class:: Vigenere(key, alphabet='abcdefghijklmnopqrstuvwxyz')
 
    The Vigenère cipher is a simple polyalphabetic substitution cipher first

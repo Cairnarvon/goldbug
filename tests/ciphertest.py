@@ -362,6 +362,59 @@ class SimpleTest(unittest.TestCase):
         self.assertEqual(repr(goldbug.cipher.Simple({'a': '!'})),
                          "Simple({'a': '!'})")
 
+class TwoSquareTest(unittest.TestCase):
+    def test_twosquare_encryption(self):
+        cipher = goldbug.cipher.TwoSquare(
+            (goldbug.util.Polybius('example', 'abcdefghijklmnoprstuvwxyz'),
+             goldbug.util.Polybius('keyword', 'abcdefghijklmnoprstuvwxyz'))
+        )
+        self.assertEqual(cipher.encrypt('helpmeobiwankenobi'),
+                         'hedlxwsdjyanhotkdg')
+
+        cipher = goldbug.cipher.TwoSquare(
+            (goldbug.util.Polybius('example', 'abcdefghijklmnoprstuvwxyz'),
+             goldbug.util.Polybius('keyword', 'abcdefghijklmnoprstuvwxyz')),
+            horizontal=True
+        )
+        self.assertEqual(cipher.encrypt('helpmeobiwankenobi'),
+                         'xgnbmebpairypgeshb')
+
+    def test_twosquare_decryption(self):
+        cipher = goldbug.cipher.TwoSquare(
+            (goldbug.util.Polybius('example', 'abcdefghijklmnoprstuvwxyz'),
+             goldbug.util.Polybius('keyword', 'abcdefghijklmnoprstuvwxyz'))
+        )
+        self.assertEqual(cipher.decrypt('hedlxwsdjyanhotkdg'),
+                         'helpmeobiwankenobi')
+
+        cipher = goldbug.cipher.TwoSquare(
+            (goldbug.util.Polybius('example', 'abcdefghijklmnoprstuvwxyz'),
+             goldbug.util.Polybius('keyword', 'abcdefghijklmnoprstuvwxyz')),
+            horizontal=True
+        )
+        self.assertEqual(cipher.decrypt('xgnbmebpairypgeshb'),
+                         'helpmeobiwankenobi')
+
+    def test_twosquare_invariants(self):
+        squares = (goldbug.util.Polybius('example',
+                                         'abcdefghijklmnoprstuvwxyz'),
+                   goldbug.util.Polybius('keyword',
+                                         'abcdefghijklmnoprstuvwxyz'))
+
+        cipher = goldbug.cipher.TwoSquare(squares)
+        self.assertEqual(cipher.encrypt('anything'),
+                         cipher.decrypt('anything'))
+
+        cipher = goldbug.cipher.TwoSquare(squares, True)
+        self.assertEqual(cipher.encrypt('anything'),
+                         cipher.decrypt('anything'))
+
+    def test_twosquare_misc(self):
+        squares = (goldbug.util.Polybius('example'),
+                   goldbug.util.Polybius('keyword'))
+        self.assertEqual(repr(goldbug.cipher.TwoSquare(squares)),
+                         'TwoSquare(%r, horizontal=False)' % (squares,))
+
 class VigenereTest(unittest.TestCase):
     def test_vigenere_encryption(self):
         cipher = goldbug.cipher.Vigenere('lemon')
