@@ -127,6 +127,38 @@ class CaesarTest(unittest.TestCase):
     def test_caesar_misc(self):
         self.assertEquals(repr(goldbug.cipher.Caesar(4)), 'Caesar(4)')
 
+class Chaocipher(unittest.TestCase):
+    def test_chaocipher_encryption(self):
+        cipher = goldbug.cipher.Chaocipher('hxuczvamdslkpefjrigtwobnyq',
+                                           'ptlnbqdeoysfavzkgjrihwxumc')
+        self.assertEqual(cipher.encrypt('welldoneisbetterthanwellsaid'),
+                                        'oahqhcnynxtszjrrhjbyhqksoujy')
+
+    def test_chaocipher_decryption(self):
+        cipher = goldbug.cipher.Chaocipher('hxuczvamdslkpefjrigtwobnyq',
+                                           'ptlnbqdeoysfavzkgjrihwxumc')
+        self.assertEqual(cipher.decrypt('oahqhcnynxtszjrrhjbyhqksoujy'),
+                                        'welldoneisbetterthanwellsaid')
+
+    def test_chaocipher_bad(self):
+        self.assertRaises(ValueError, goldbug.cipher.Chaocipher,
+                          'abcdefghijklmnopqrstuvwxyz',
+                          'abcdefghijklmnopqrstuvwxy')
+        self.assertRaises(ValueError, goldbug.cipher.Chaocipher,
+                          'abcdefghijklmnopqrstuvwyyz',
+                          'abcdefghijklmnopqrstuvwxyz')
+        self.assertRaises(ValueError, goldbug.cipher.Chaocipher,
+                          'ab', 'ab')
+        self.assertRaises(ValueError, goldbug.cipher.Chaocipher,
+                          'abcdefghijklm', 'nopqrstuvwxyz')
+
+    def test_chaocipher_misc(self):
+        cipher = goldbug.cipher.Chaocipher('hxuczvamdslkpefjrigtwobnyq',
+                                           'ptlnbqdeoysfavzkgjrihwxumc')
+        self.assertEqual(repr(cipher),
+                         "Chaocipher('hxuczvamdslkpefjrigtwobnyq', "
+                         "'ptlnbqdeoysfavzkgjrihwxumc')")
+
 class FourSquareTest(unittest.TestCase):
     def test_foursquare_encryption(self):
         cipher = goldbug.cipher.FourSquare(

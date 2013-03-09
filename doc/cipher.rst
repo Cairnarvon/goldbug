@@ -109,6 +109,35 @@ a **simple** substitution cipher; if it operates on groups of characters, it is
 
    :param key: an integer, ideally between 0 and 26.
 
+.. class:: Chaocipher(left, right)
+
+   The Chaocipher is a cipher designed by J. F. Byrne in 1918, and mentioned
+   in his 1953 autobiography *Silent Years*. He believed it to be simple but
+   unbreakable, and offered cash rewards to anyone who could break it. Nobody
+   ever did, and the algorithm remained a mystery until May 2010, when the
+   Byrne family donated all of Byrne's Chaocipher-related papers and artifacts
+   to the National Cryptological Museum in Maryland.
+
+   The cipher's key consists of two permuted alphabets, traditionally written
+   around the edge of two disks. For every character being encrypted, the right
+   disk is rotated until that character it at the top of the disk (the
+   *zenith*), and the left disk is rotated by the same number of steps. The
+   ciphertext character is character now at the left disk's zenith. After
+   that, the disk alphabets are permuted as follows: the character to the
+   right of the zenith on the left disk is removed, leaving a gap; this gap is
+   closed by inserting the removed character at the bottom of the disk (the
+   *nadir*) and moving the characters to its right up. The right disk is then
+   rotated by one additional step, and the same thing happens with the
+   character two positions to the right of its zenith.
+
+   This process of dynamic substitution leads to what one genius described as
+   "utter chaotification" of the plaintext. Decryption is the same process,
+   except rotating the left disk and reading from the right; the permutation
+   step is identical.
+
+   :param left:
+   :param right: Permuted alphabets.
+
 .. class:: FourSquare(keys, alphabet=goldbug.util.Polybius(''), padding='x')
 
    The four-square cipher is a polygraphic substitution cipher by Félix

@@ -141,6 +141,77 @@ class Caesar(MonoalphabeticSubstitutionCipher):
         self.encrypt_mapping = dict(zip(string.ascii_lowercase, shifted))
         self.decrypt_mapping = dict(zip(shifted, string.ascii_lowercase))
 
+class Chaocipher(Cipher):
+    """
+    The Chaocipher is a cipher designed in 1918 by J. F. Byrne and mentioned
+    in his 1953 autobiography Silent Years. He believed it to be simple but
+    unbreakable, and offered cash rewards to anyone who could break it.
+    The algorithm remained a mystery until 2010, when the Byrne family donated
+    all of Byrne's Chaocipher-related papers and artifacts to the National
+    Cryptological Museum in Maryland.
+    """
+    def __init__(self, left, right):
+        """
+        left and right are permuted alphabets.
+        """
+        self.left, self.right = left, right
+        lefts, rights = set(left), set(right)
+        if lefts != rights or len(lefts) < 3 or \
+           len(lefts) != len(left) or len(rights) != len(right):
+            raise ValueError('Invalid keys!')
+
+    def __permute(self, left, right, idx):
+        idx %= len(left)
+
+        # Permute left
+        # Rotate idx to zenith
+        left = (left + left)[idx:idx + len(left)]
+        # Insert zenith + 1 at nadir
+        c = left.pop(1)
+        left.insert(len(self.left) // 2, c)
+
+        # Permute right
+        # Rotate idx to zenith - 1
+        right = (right * 3)[idx + 1:idx + len(right) + 1]
+        # Insert zenith + 2 at nadir
+        c = right.pop(2)
+        right.insert(len(self.right) // 2, c)
+
+        return left, right
+
+    def encrypt(self, text):
+        """
+        Transforms plaintext into ciphertext.
+        """
+        cipher = []
+        left, right = list(self.left), list(self.right)
+        for c in text:
+            if c in left:
+                idx = right.index(c)
+                cipher.append(left[idx])
+                left, right = self.__permute(left, right, idx)
+            else:
+                cipher.append(c)
+        return ''.join(cipher)
+
+    def decrypt(self, text):
+        """
+        Transforms ciphertext into plaintext.
+        """
+        plain = []
+        left, right = list(self.left), list(self.right)
+        for c in text:
+            if c in right:
+                idx = left.index(c)
+                plain.append(right[idx])
+                left, right = self.__permute(left, right, idx)
+            else:
+                cipher.append(c)
+        return ''.join(plain)
+
+    def __repr__(self):
+        return '%s(%r, %r)' % (self.__class__.__name__, self.left, self.right)
+
 class FourSquare(Cipher):
     """
     The four-square cipher is a polygraphic substitution cipher by Felix
