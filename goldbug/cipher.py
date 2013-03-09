@@ -45,16 +45,20 @@ class MonoalphabeticSubstitutionCipher(Cipher):
         Encrypts the given text. Plaintext case will be preserved in the
         ciphertext, to the extent that this makes sense.
         """
-        return ''.join((type(text).lower, type(text).upper)[c.isupper()]\
-                       (self.encrypt_mapping.get(c.lower(), c)) for c in text)
+        return type(text)('').join(
+            (lambda c: c.lower(), lambda c: c.upper())[c.isupper()]\
+            (self.encrypt_mapping.get(c.lower(), c)) for c in text
+        )
 
     def decrypt(self, text):
         """
         Decrypts the given text. Ciphertext case will be preserved in the
         plaintext, to the extent that this makes sense.
         """
-        return ''.join((type(text).lower, type(text).upper)[c.isupper()]\
-                       (self.decrypt_mapping.get(c.lower(), c)) for c in text)
+        return type(text)('').join(
+            (lambda c: c.lower(), lambda c: c.upper())[c.isupper()]\
+            (self.decrypt_mapping.get(c.lower(), c)) for c in text
+        )
 
 
 class Affine(MonoalphabeticSubstitutionCipher):
@@ -192,7 +196,7 @@ class Chaocipher(Cipher):
                 left, right = self.__permute(left, right, idx)
             else:
                 cipher.append(c)
-        return ''.join(cipher)
+        return type(text)('').join(cipher)
 
     def decrypt(self, text):
         """
@@ -207,7 +211,7 @@ class Chaocipher(Cipher):
                 left, right = self.__permute(left, right, idx)
             else:
                 cipher.append(c)
-        return ''.join(plain)
+        return type(text)('').join(plain)
 
     def __repr__(self):
         return '%s(%r, %r)' % (self.__class__.__name__, self.left, self.right)
@@ -277,27 +281,27 @@ class FourSquare(Cipher):
         """
         if len(text) % 2 == 1:
             text += self.padding
-        text = (c for c in text)
+        textgen = (c for c in text)
         cipher = []
-        for a, b in zip(text, text):
+        for a, b in zip(textgen, textgen):
             x1, y1 = self.alphabet[a]
             x2, y2 = self.alphabet[b]
             cipher.append(self.keys[0][x1, y2])
             cipher.append(self.keys[1][x2, y1])
-        return ''.join(cipher)
+        return type(text)('').join(cipher)
 
     def decrypt(self, text):
         """
         Transforms ciphertext into plaintext.
         """
-        text = (c for c in text)
+        textgen = (c for c in text)
         plain = []
-        for a, b in zip(text, text):
+        for a, b in zip(textgen, textgen):
             x1, y1 = self.keys[0][a]
             x2, y2 = self.keys[1][b]
             plain.append(self.alphabet[x1, y2])
             plain.append(self.alphabet[x2, y1])
-        return ''.join(plain)
+        return type(text)('').join(plain)
 
     def __repr__(self):
         return '%s(%r, %r)' % (self.__class__.__name__,
@@ -362,7 +366,7 @@ class Hill(Cipher):
                                          for c in text[i:i + self.key.rows])))
             m = self.key * chunk % self.modulus
             cipher.extend([self.alphabet[c] for c in m.col(0)])
-        return ''.join(cipher)
+        return type(text)('').join(cipher)
 
     def decrypt(self, text):
         """
@@ -374,7 +378,7 @@ class Hill(Cipher):
                                          for c in text[i:i + self.invkey.rows])))
             m = self.invkey * chunk % self.modulus
             plain.extend([self.alphabet[c] for c in m.col(0)])
-        return ''.join(plain)
+        return type(text)('').join(plain)
 
     def __repr__(self):
         if self.alphabet == string.ascii_lowercase:
@@ -480,13 +484,15 @@ class Playfair(MonoalphabeticSubstitutionCipher):
         """
         Turn provided plaintext into ciphertext.
         """
-        return ''.join(self.__polyb(b) for b in self.__plain_pairs(text))
+        return type(text)('').join(self.__polyb(b)
+                                   for b in self.__plain_pairs(text))
 
     def decrypt(self, text):
         """
         Turn provided ciphertext into plaintext.
         """
-        return ''.join(self.__polyb(b, True) for b in self.__cipher_pairs(text))
+        return type(text)('').join(self.__polyb(b, True)
+                                   for b in self.__cipher_pairs(text))
 
     def __plain_pairs(self, text):
         """
@@ -618,9 +624,9 @@ class TwoSquare(Cipher):
         Transforms plaintext into ciphertext.
         """
         lastchar = text[-1] if len(text) % 2 == 1 else ''
-        text = (c for c in text)
+        textgen = (c for c in text)
         cipher = []
-        for a, b in zip(text, text):
+        for a, b in zip(textgen, textgen):
             r1, c1 = self.keys[0][a]
             r2, c2 = self.keys[1][b]
 
@@ -639,7 +645,7 @@ class TwoSquare(Cipher):
                     cipher.append(self.keys[0][r1, c2])
                     cipher.append(self.keys[1][r2, c1])
         cipher.append(lastchar)
-        return ''.join(cipher)
+        return type(text)('').join(cipher)
 
     def decrypt(self, text):
         """
@@ -684,14 +690,16 @@ class Vigenere(Cipher):
         Transform plaintext into ciphertext.
         """
         tabula = util.TabulaRecta(self.alphabet)
-        return ''.join(tabula[co] for co in zip(text, self.__keystream()))
+        return type(text)('').join(tabula[co]
+                                   for co in zip(text, self.__keystream()))
 
     def decrypt(self, text):
         """
         Transform ciphertext into plaintext.
         """
         tabula = util.TabulaRecta(self.alphabet, reverse=True)
-        return ''.join(tabula[co] for co in zip(text, self.__keystream()))
+        return type(text)('').join(tabula[co]
+                                   for co in zip(text, self.__keystream()))
 
     def __keystream(self):
         while True:
@@ -716,7 +724,8 @@ class Autokey(Vigenere):
         Transform plaintext into ciphertext.
         """
         tabula = util.TabulaRecta(self.alphabet)
-        return ''.join(tabula[co] for co in zip(text, self.key + text))
+        return type(text)('').join(tabula[co]
+                                   for co in zip(text, self.key + text))
 
     def decrypt(self, text):
         """
@@ -729,7 +738,7 @@ class Autokey(Vigenere):
             c = tabula[text[i], key[i]]
             plain.append(c)
             key.append(c)
-        return ''.join(plain)
+        return type(text)('').join(plain)
 
 # Transposition ciphers
 
@@ -793,7 +802,7 @@ class Column(Cipher):
 
         # Index them by ciphertext character and sort alphabetically.
         columns = dict((k, v) for k, v in zip(self.key, columns))
-        return ''.join(columns[k] for k in sorted(self.key))
+        return type(text)('').join(columns[k] for k in sorted(self.key))
 
     def decrypt(self, text):
         """
@@ -813,7 +822,8 @@ class Column(Cipher):
         columns = [columns[c] for c in self.key]
 
         # Just read off the plaintext.
-        return ''.join(''.join(row) for row in zip(*columns)).rstrip(self.pad)
+        return type(text)('').join(''.join(row)
+                                   for row in zip(*columns)).rstrip(self.pad)
 
     def __repr__(self):
         return '%s(%r, pad=%r)' % (self.__class__.__name__, self.key, self.pad)
@@ -840,7 +850,7 @@ class RailFence(Cipher):
                                   list(range(self.key - 1, 0, -1)))
         for c in text:
             rails[next(indices)].append(c)
-        return ''.join(sum(rails, []))
+        return type(text)('').join(sum(rails, []))
 
     def decrypt(self, text):
         """
@@ -903,7 +913,8 @@ class RailFence(Cipher):
         gens = [(c for c in row) for row in rows]
         indices = itertools.cycle(list(range(self.key - 1)) +
                                   list(range(self.key - 1, 0, -1)))
-        return ''.join(next(gens[next(indices)]) for _ in range(len(text)))
+        return type(text)('').join(next(gens[next(indices)])
+                                   for _ in range(len(text)))
 
     def __periods(self, length):
         """
@@ -1004,8 +1015,10 @@ class Bifid(Cipher):
         coords = sum(tuple(zip(*coords)), ())
 
         # Look up the characters for each new pair of coordinates.
-        return ''.join(self.polybius[coords[i:i + self.polybius.dimensions]]
-                       for i in range(0, len(coords), self.polybius.dimensions))
+        return type(text)('').join(
+            self.polybius[coords[i:i + self.polybius.dimensions]]
+            for i in range(0, len(coords), self.polybius.dimensions)
+        )
 
     def __decrypt_block(self, text):
         # Look up the coordinates of each ciphertext character.
@@ -1017,7 +1030,7 @@ class Bifid(Cipher):
         coords = zip(*rows)
 
         # Look up the plaintext characters.
-        return ''.join(self.polybius[tuple(co)] for co in coords)
+        return type(text)('').join(self.polybius[tuple(co)] for co in coords)
 
     def __repr__(self):
         if self.period > 0:
