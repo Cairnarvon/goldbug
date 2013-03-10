@@ -9,6 +9,14 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 import goldbug
 
+if not hasattr(unittest, 'skipIf'):
+    # skipIf was introduced in 2.7. We're only using skipIf to skip tests in
+    # Python 3, though, so if skipIf isn't present, we'll just run them
+    # unconditionally.
+    def skipIf(condition, reason):
+        return lambda fn: fn
+    unittest.skipIf = skipIf
+
 # Substitution ciphers
 
 class AffineTest(unittest.TestCase):
@@ -39,6 +47,13 @@ class AffineTest(unittest.TestCase):
     def test_affine_bad(self):
         self.assertRaises(ValueError, goldbug.cipher.Affine, (2, 4))
 
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.Affine((5, 7))
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
+
     def test_affine_misc(self):
         self.assertEqual(repr(goldbug.cipher.Affine((5, 7))),
                          "Affine((5, 7), alphabet='abcdefghijklmnopqrstuvwxyz')")
@@ -65,6 +80,13 @@ class AtbashTest(unittest.TestCase):
         self.assertEqual(cipher.encrypt('test'), cipher.decrypt('test'))
         self.assertEqual(cipher.encrypt(cipher.encrypt('test')), 'test')
 
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.Atbash()
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
+
     def test_atbash_misc(self):
         self.assertEqual(repr(goldbug.cipher.Atbash()),
                          "Atbash(alphabet='abcdefghijklmnopqrstuvwxyz')")
@@ -79,6 +101,13 @@ class AutokeyTest(unittest.TestCase):
     def test_autokey_decryption(self):
         cipher = goldbug.cipher.Autokey('queenly')
         self.assertEqual(cipher.decrypt('qnxepvytwtwp'), 'attackatdawn')
+
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.Autokey('something')
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
 
     def test_autokey_misc(self):
         self.assertEqual(repr(goldbug.cipher.Autokey('queenly')),
@@ -124,6 +153,13 @@ class CaesarTest(unittest.TestCase):
 
         self.assertRaises(ValueError, goldbug.cipher.Caesar, 'notakey')
 
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.Caesar(14)
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
+
     def test_caesar_misc(self):
         self.assertEquals(repr(goldbug.cipher.Caesar(4)), 'Caesar(4)')
 
@@ -151,6 +187,14 @@ class Chaocipher(unittest.TestCase):
                           'ab', 'ab')
         self.assertRaises(ValueError, goldbug.cipher.Chaocipher,
                           'abcdefghijklm', 'nopqrstuvwxyz')
+
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.Chaocipher('abcdefghijklmnopqrstuvwxyz',
+                                           'abcdefghijklmnopqrstuvwxyz')
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
 
     def test_chaocipher_misc(self):
         cipher = goldbug.cipher.Chaocipher('hxuczvamdslkpefjrigtwobnyq',
@@ -187,6 +231,14 @@ class FourSquareTest(unittest.TestCase):
         self.assertRaises(ValueError, goldbug.cipher.FourSquare, (p1, p1), p3)
         self.assertRaises(ValueError, goldbug.cipher.FourSquare, (p1, p2), p3)
 
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.FourSquare((goldbug.util.Polybius('example'),
+                                            goldbug.util.Polybius('key')))
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
+
     def test_foursquare_misc(self):
         cipher = goldbug.cipher.FourSquare((goldbug.util.Polybius('secret'),
                                             goldbug.util.Polybius('message')))
@@ -208,6 +260,13 @@ class HillTest(unittest.TestCase):
         self.assertRaises(TypeError, goldbug.cipher.Hill, 1)
         self.assertRaises(ValueError, goldbug.cipher.Hill,
                           goldbug.util.Matrix(((1, 2), (3, 4))), 'abcdd')
+
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.Hill(goldbug.util.Matrix([[3, 3], [2, 5]]))
+        self.assertEqual(type(cipher.encrypt('test')), type('test'))
+        self.assertEqual(type(cipher.encrypt('test'.decode('utf8'))),
+                         type('test'.decode('utf8')))
 
     def test_hill_misc(self):
         self.assertEqual(goldbug.cipher.Hill('ddcf').key,
@@ -236,6 +295,14 @@ class HomophonicTest(unittest.TestCase):
         self.assertEqual(cipher.decrypt('23'), 'ab')
         self.assertEqual(cipher.decrypt('24'), 'ab')
 
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.Homophonic(goldbug.util.RandomDict({'a': '12',
+                                                                    'b': '34'}))
+        self.assertEqual(type(cipher.encrypt('abab')), type('abab'))
+        self.assertEqual(type(cipher.encrypt('abab'.decode('utf8'))),
+                         type('abab'.decode('utf8')))
+
     def test_homophonic_misc(self):
         d = goldbug.util.RandomDict({'a': '12', 'b': '34'})
         self.assertEqual(repr(goldbug.cipher.Homophonic(d)),
@@ -258,6 +325,13 @@ class KamaSutraTest(unittest.TestCase):
 
         cipher = goldbug.cipher.KamaSutra('')
         self.assertEqual(cipher.encrypt('whatever'), 'whatever')
+
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.KamaSutra('abcdefghijklmnopqrstuvwxyz')
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
 
     def test_kamasutra_misc(self):
         self.assertEqual(repr(goldbug.cipher.KamaSutra('abcdefgh')),
@@ -301,6 +375,13 @@ class KeywordTest(unittest.TestCase):
     def test_keyword_badkeys(self):
         cipher = goldbug.cipher.Keyword('.#;@')
         self.assertEqual(cipher.encrypt('ddbabcbc'), '@@#.#;#;')
+
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.Keyword('kryptos')
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
 
     def test_keyword_misc(self):
         self.assertEqual(repr(goldbug.cipher.Keyword('abc')), "Keyword('abc')")
@@ -348,6 +429,13 @@ class PlayfairTest(unittest.TestCase):
         self.assertRaises(ValueError, goldbug.cipher.Playfair, '',
                           omitted={'a': '.'})
 
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.Playfair('a')
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
+
     def test_playfair_misc(self):
         self.assertEqual(
             repr(goldbug.cipher.Playfair('a')),
@@ -370,6 +458,13 @@ class Rot13Test(unittest.TestCase):
         self.assertEqual(cipher.encrypt('test'), cipher.decrypt('test'))
         self.assertEqual(cipher.encrypt(cipher.encrypt('test')), 'test')
 
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.Rot13()
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
+
     def test_rot13_misc(self):
         self.assertEqual(repr(goldbug.cipher.Rot13()), 'Rot13()')
 
@@ -389,6 +484,13 @@ class SimpleTest(unittest.TestCase):
 
     def test_simple_bad(self):
         self.assertRaises(AttributeError, goldbug.cipher.Simple, 14)
+
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.Simple({'a': '!'})
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
 
     def test_simple_misc(self):
         self.assertEqual(repr(goldbug.cipher.Simple({'a': '!'})),
@@ -441,6 +543,14 @@ class TwoSquareTest(unittest.TestCase):
         self.assertEqual(cipher.encrypt('anything'),
                          cipher.decrypt('anything'))
 
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.TwoSquare((goldbug.util.Polybius('example'),
+                                           goldbug.util.Polybius('keyword')))
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
+
     def test_twosquare_misc(self):
         squares = (goldbug.util.Polybius('example'),
                    goldbug.util.Polybius('keyword'))
@@ -470,6 +580,13 @@ class VigenereTest(unittest.TestCase):
 
         cipher = goldbug.cipher.Vigenere('test')
         self.assertRaises(KeyError, cipher.encrypt, 'abc..def')
+
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.Vigenere('lemon')
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
 
     def test_vigenere_misc(self):
         self.assertEqual(repr(goldbug.cipher.Vigenere('lemon')),
@@ -513,6 +630,13 @@ class ColumnTest(unittest.TestCase):
 
         cipher = goldbug.cipher.Column('abc')
         self.assertRaises(ValueError, cipher.decrypt, 'abcd')
+
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.Column('lemon')
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
 
     def test_column_misc(self):
         self.assertEqual(repr(goldbug.cipher.Column('cipher')),
@@ -562,6 +686,13 @@ class RailFenceTest(unittest.TestCase):
         cipher = goldbug.cipher.RailFence(1)
         self.assertRaises(ZeroDivisionError, cipher._RailFence__periods, 12)
 
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.RailFence(5)
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
+
     def test_railfence_misc(self):
         self.assertEqual(repr(goldbug.cipher.RailFence(4)), 'RailFence(4)')
 
@@ -606,6 +737,13 @@ class BifidTest(unittest.TestCase):
         self.assertRaises(KeyError, cipher.encrypt, '!!!')
         self.assertRaises(KeyError, cipher.decrypt, '!!!')
 
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.Bifid(goldbug.util.Polybius(''), 3)
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
+
     def test_bifid_misc(self):
         self.assertEqual(repr(goldbug.cipher.Bifid('bgwkzqpndsioaxefclumthyvr')),
                          "Bifid('bgwkzqpndsioaxefclumthyvr')")
@@ -641,6 +779,13 @@ class TrifidTest(unittest.TestCase):
 
         cipher = goldbug.cipher.Trifid('abcdefgh', 3)
         self.assertRaises(KeyError, cipher.decrypt, 'ijklm')
+
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.Trifid('abcdefghijklmnopqrstuvwxyz.')
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
 
     def test_trifid_misc(self):
         self.assertEqual(repr(goldbug.cipher.Trifid('abcdefgh', 3)),
