@@ -261,6 +261,10 @@ class HillTest(unittest.TestCase):
         self.assertRaises(ValueError, goldbug.cipher.Hill,
                           goldbug.util.Matrix(((1, 2), (3, 4))), 'abcdd')
 
+        cipher = goldbug.cipher.Hill(goldbug.util.Matrix([[3, 3], [2, 5]]))
+        self.assertRaises(ValueError, cipher.encrypt, 'abc')
+        self.assertRaises(ValueError, cipher.decrypt, 'abc')
+
     @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
     def test_unicode(self):
         cipher = goldbug.cipher.Hill(goldbug.util.Matrix([[3, 3], [2, 5]]))

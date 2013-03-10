@@ -360,6 +360,9 @@ class Hill(Cipher):
         """
         Transforms plaintext into ciphertext.
         """
+        if len(text) % self.key.rows != 0:
+            raise ValueError('Input length must be a multiple of %d!' %
+                             self.key.rows)
         cipher = []
         for i in range(0, len(text), self.key.rows):
             chunk = util.Matrix(list(zip(self.alphabet.index(c)
@@ -372,6 +375,9 @@ class Hill(Cipher):
         """
         Transforms ciphertext into plaintext.
         """
+        if len(text) % self.invkey.rows != 0:
+            raise ValueError('Input length must be a multiple of %d!' %
+                             self.invkey.rows)
         plain = []
         for i in range(0, len(text), self.invkey.rows):
             chunk = util.Matrix(list(zip(self.alphabet.index(c)
