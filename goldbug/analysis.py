@@ -40,7 +40,9 @@ def chi2(text, freqs):
 
 def ic(text, alphabet=string.ascii_lowercase):
     """
-    Calculates the monographic index of coincidence for a given piece of text.
+    Calculates the index of coincidence for a given piece of text.
+    By default it calculates the monographic A-Z IC; pass it a list of bigrams
+    (as goldbug.freq.*.bigrams.keys()), trigrams, &c. for polygraphic IC.
     """
     text = [c for c in text if c in alphabet]
     if len(text) < 2:
