@@ -38,5 +38,11 @@ class ICTest(unittest.TestCase):
                                1.5166667)
         self.assertRaises(ValueError, goldbug.analysis.ic, '')
 
+        self.assertAlmostEqual(goldbug.analysis.ic('bcbcabaaababbabcbccc',
+                                                   ['aa', 'ab', 'ac',
+                                                    'ba', 'bb', 'bc',
+                                                    'ca', 'cb', 'cc']),
+                               0.9473684)
+
 if __name__ == '__main__':
     unittest.main()

@@ -41,19 +41,24 @@ Text characterisation
    text differs from a flat distribution, and is left unchanged by simple
    substitution ciphers (and all transposition ciphers).
 
-       >>> goldbug.util.ic('abcdefghijklmnopqrstuvwxyz')
+       >>> goldbug.analysis.ic('abcdefghijklmnopqrstuvwxyz')
        0.0
-       >>> goldbug.util.ic('how much wood would a woodchuck chuck if a woodchuck could chuck wood?')
+       >>> goldbug.analysis.ic('how much wood would a woodchuck chuck if a woodchuck could chuck wood?')
        2.8345864661654137
        >>> goldbug.cipher.Caesar(14).encrypt('how much wood would a woodchuck chuck if a woodchuck could chuck wood?')
        'vck aiqv kccr kcizr o kccrqviqy qviqy wt o kccrqviqy qcizr qviqy kccr?'
-       >>> goldbug.util.ic('vck aiqv kccr kcizr o kccrqviqy qviqy wt o kccrqviqy qcizr qviqy kccr?')
+       >>> goldbug.analysis.ic('vck aiqv kccr kcizr o kccrqviqy qviqy wt o kccrqviqy qcizr qviqy kccr?')
        2.8345864661654137
 
-   It is also useful when cryptanalysing the Vigenère cipher.
-   (Details to follow.)
+   If you want to calculate the di- or higher-graphic index of coincidence, just
+   pass a list of appropriate n-grams as the second argument:
 
-   .. TODO
+      >>> goldbug.analysis.ic('how much wood would a woodchuck etc.',
+      ...                     goldbug.freq.english.bigram.keys())
+      12.518518518518519
+      >>> goldbug.analysis.ic('babbbcccbbcbaaacccaa',
+      ...                     list(goldbug.util.textgen('abc', 3, 3)))
+      0.3529411764705882
 
    Note that this implementation takes your text at face value. It doesn't
    touch case, and will happily chuck out capital letters (if you're using the

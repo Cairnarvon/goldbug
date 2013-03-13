@@ -44,11 +44,22 @@ def ic(text, alphabet=string.ascii_lowercase):
     By default it calculates the monographic A-Z IC; pass it a list of bigrams
     (as goldbug.freq.*.bigrams.keys()), trigrams, &c. for polygraphic IC.
     """
-    text = [c for c in text if c in alphabet]
-    if len(text) < 2:
+    # Ensure all n-grams are the same size.
+    n = len(alphabet[0])
+    if any(n != len(gram) for gram in alphabet):
+        raise ValueError("N-grams aren't all the same size!")
+
+    # Clean input to the extent possible.
+    text = ''.join(c for c in text if c in ''.join(alphabet))
+
+    # Split the text into n-grams.
+    grams = [text[i:i + n] for i in range(len(text) - n + 1)
+             if text[i:i + n] in alphabet]
+    if len(grams) < 2:
         raise ValueError('Text is too short!')
+
     ic = 0
-    for c in alphabet:
-        fi = text.count(c)
+    for gram in alphabet:
+        fi = grams.count(gram)
         ic += fi * (fi - 1)
-    return ic / (len(text) * (len(text) - 1) / float(len(alphabet)))
+    return ic / (len(grams) * (len(grams) - 1) / float(len(alphabet)))
