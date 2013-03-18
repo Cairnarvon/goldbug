@@ -356,3 +356,65 @@ def textgen(alphabet=string.ascii_lowercase, min_length=0, max_length=None):
                 i += 1
             else:
                 break
+
+def numberword(n, shortscale=True):
+    """
+    Transforms an integer into a string representing its English pronunciation.
+
+    >>> numberword(15)
+    'fifteen'
+    >>> numberword(1001)
+    'onethousandone'
+    >>> numberword(-1)
+    'negativeone'
+    >>> numberword(1000000000)
+    'onebillion'
+    >>> numberword(1000000000, shortscale=False)
+    'onemilliard'
+    """
+    # Lookup tables.
+    tens = ('', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy',
+            'eighty', 'ninety')
+    hundreds = ('', 'onehundred', 'twohundred', 'threehundred', 'fourhundred',
+                'fivehundred', 'sixhundred', 'sevenhundred', 'eighthundred',
+                'ninehundred')
+
+    # Numbers below 20 are too irregular.
+    lt20 = ('', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight',
+            'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen',
+            'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen')
+
+    # Optional long scale in case people want long scale.
+    shorts = ('', 'thousand', 'million', 'billion', 'trillion',
+              'quadrillion', 'quintillion', 'sextillion', 'septillion',
+              'octillion', 'nonillion', 'decillion')
+    longs = ('', 'thousand', 'million', 'milliard', 'billion', 'billiard',
+             'trillion', 'trilliard', 'quadrillion', 'quadrilliard',
+             'quintillion', 'quintilliard')
+    bignums = shorts if shortscale else longs
+
+    n = int(n)
+    if n < 0:
+        n *= -1
+        prefix = 'negative'
+    else:
+        prefix = ''
+
+    if n >= 1000 ** len(bignums):
+        raise NotImplementedError('Value is out of range!')
+
+    w = []
+    while n:
+        n, rest = divmod(n, 1000)
+        hund, rest = divmod(rest, 100)
+        hund = lt20[hund] + 'hundred' if hund else ''
+        if rest < 20:
+            rest = lt20[rest]
+        else:
+            t, u = divmod(rest, 10)
+            rest = tens[t] + lt20[u]
+        w.append(hund + rest)
+
+    if not w:
+        return 'zero'
+    return prefix + ''.join(reversed([a + b for a, b in zip(w, bignums) if a]))

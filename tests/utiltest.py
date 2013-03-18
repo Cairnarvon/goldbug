@@ -247,5 +247,49 @@ class RandomDictTest(unittest.TestCase):
         a_items = [item[1] for item in d.items() if item[0] == 'a']
         self.assertEqual(sorted(a_items), ['a', 'b', 'c'])
 
+class NumberwordTest(unittest.TestCase):
+    def test_numberword(self):
+        self.assertEqual(goldbug.util.numberword(0), 'zero')
+        self.assertEqual(goldbug.util.numberword(1), 'one')
+        self.assertEqual(goldbug.util.numberword(2), 'two')
+        self.assertEqual(goldbug.util.numberword(10), 'ten')
+        self.assertEqual(goldbug.util.numberword(11), 'eleven')
+        self.assertEqual(goldbug.util.numberword(21), 'twentyone')
+        self.assertEqual(goldbug.util.numberword(100), 'onehundred')
+        self.assertEqual(goldbug.util.numberword(101), 'onehundredone')
+        self.assertEqual(goldbug.util.numberword(102), 'onehundredtwo')
+        self.assertEqual(goldbug.util.numberword(110), 'onehundredten')
+        self.assertEqual(goldbug.util.numberword(111), 'onehundredeleven')
+        self.assertEqual(goldbug.util.numberword(120), 'onehundredtwenty')
+        self.assertEqual(goldbug.util.numberword(1001), 'onethousandone')
+        self.assertEqual(goldbug.util.numberword(1101),
+                         'onethousandonehundredone')
+        self.assertEqual(goldbug.util.numberword(1111),
+                         'onethousandonehundredeleven')
+        self.assertEqual(goldbug.util.numberword(123456),
+                         'onehundredtwentythreethousandfourhundredfiftysix')
+        self.assertEqual(goldbug.util.numberword(1000000), 'onemillion')
+        self.assertEqual(goldbug.util.numberword(123456789),
+                         'onehundredtwentythreemillion'
+                         'fourhundredfiftysixthousand'
+                         'sevenhundredeightynine')
+
+        self.assertEqual(goldbug.util.numberword(-1), 'negativeone')
+        self.assertEqual(goldbug.util.numberword(-1000), 'negativeonethousand')
+
+    def test_numberword_scales(self):
+        self.assertEqual(goldbug.util.numberword(1000000),
+                         goldbug.util.numberword(1000000, False))
+        self.assertEqual(goldbug.util.numberword(1000000001),
+                         'onebillionone')
+        self.assertEqual(goldbug.util.numberword(1000000001, False),
+                         'onemilliardone')
+
+    def test_numberword_bad(self):
+        self.assertRaises(TypeError, goldbug.util.numberword, None)
+        self.assertRaises(ValueError, goldbug.util.numberword, 'test')
+        self.assertRaises(ValueError, goldbug.util.numberword, float('nan'))
+        self.assertRaises(OverflowError, goldbug.util.numberword, float('inf'))
+
 if __name__ == '__main__':
     unittest.main()

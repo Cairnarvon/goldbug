@@ -155,6 +155,13 @@ Functions
    raising a :class:`ValueError` if *a* is not prime relative to *m* (and
    the multiplicative inverse therefore doesn't exist).
 
+.. function:: numberword(n, shortscale=True)
+
+   This translates an integer into its English-language equivalent, without
+   spaces or dashes. It's used internally by :class:`goldbug.cipher.Bazeries`.
+
+   This implementation will handle numbers up to :math:`1000^{12} - 1`.
+
 .. function:: textgen(alphabet='abcdefghijklmnopqrstuvwxyz', min_length=0, max_length=None)
 
    A generator generating all strings it is possible to form with a given
