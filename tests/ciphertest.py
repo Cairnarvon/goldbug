@@ -711,6 +711,53 @@ class RailFenceTest(unittest.TestCase):
 
 # Other ciphers.
 
+class BazeriesTest(unittest.TestCase):
+    def test_bazeries_encrypt(self):
+        cipher = goldbug.cipher.Bazeries(1973)
+        self.assertEqual(cipher.encrypt('retreatatoncetheenemy'
+                                        'isoutnumberingyou'),
+                         'dklolopdlpppvlpryapymuaxylxkbgkmsygdpx')
+
+        cipher = goldbug.cipher.Bazeries(81257)
+        self.assertEqual(cipher.encrypt('whoeverhasmadeavoyageupthehudson'
+                                        'mustrememberthekaatskillmountains'),
+                         'dumtmcdsenrtemveqxmoelccrvxdmdkwx'
+                         'nnmukrdkumynmbprkeepmgngekwxcrwb')
+
+    def test_bazeries_decrypt(self):
+        cipher = goldbug.cipher.Bazeries(1973)
+        self.assertEqual(cipher.decrypt('dklolopdlpppvlpryapym'
+                                        'uaxylxkbgkmsygdpx'),
+                         'retreatatoncetheenemyisoutnumberingyou')
+
+        cipher = goldbug.cipher.Bazeries(81257)
+        self.assertEqual(cipher.decrypt('dumtmcdsenrtemveqxmoelccrvxdmdkwx'
+                                        'nnmukrdkumynmbprkeepmgngekwxcrwb'),
+                         'whoeverhasmadeavoyageupthehudson'
+                         'mustrememberthekaatskillmountains'),
+
+    def test_bazeries_transpose(self):
+        cipher = goldbug.cipher.Bazeries(123)
+        self.assertEqual(''.join(cipher._Bazeries__transpose("abcdefghij")),
+                         'acbfedgihj')
+        cipher = goldbug.cipher.Bazeries(321)
+        self.assertEqual(''.join(cipher._Bazeries__transpose("abcdefghij")),
+                         'cbaedfihgj')
+
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.Bazeries(512)
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
+
+    def test_bazeries_misc(self):
+        self.assertEqual(repr(goldbug.cipher.Bazeries(14)), 'Bazeries(14)')
+        self.assertEqual(
+            repr(goldbug.cipher.Bazeries(12, 'abcdefghijklmnoprstuvwxyz')),
+            "Bazeries(12, alphabet='abcdefghijklmnoprstuvwxyz')"
+        )
+
 class BifidTest(unittest.TestCase):
     def test_bifid_encrypt(self):
         cipher = goldbug.cipher.Bifid('bgwkzqpndsioaxefclumthyvr')

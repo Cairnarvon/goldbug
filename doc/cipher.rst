@@ -525,6 +525,68 @@ Other ciphers
 These ciphers combine substitution with transposition, or have something
 exotic going on that makes them difficult to classify.
 
+.. class:: Bazeries(key, alphabet='abcdefghiklmnopqrstuvwxyz', numberword=goldbug.util.numberword)
+
+   The Bazeries cipher (not to be confused with the Bazeries cylinder) was
+   designed by French military analyst Étienne Bazeries (1846--1931). It
+   combines transposition and substitution.
+
+   Its key is an integer, which is used in two ways.
+
+   First, it is used to permute the input. If the key is, for example, 1325,
+   the plaintext is divided into segments of lengths 1, 3, 2, and 5, and each
+   segment is reversed, as follows:
+
+      +--------------+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+      |              | 1 |     3     |   2   |         5         | 1 |     3     |
+      +==============+===+===+===+===+===+===+===+===+===+===+===+===+===+===+===+
+      | **original** | s | a | m | p | l | e | p | l | a | i | n | t | e | x | t |
+      +--------------+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+      | **permuted** | s | p | m | a | e | l | n | i | a | l | p | t | t | x | e |
+      +--------------+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+   For the substitution step, two Polybius squares are used. The first just
+   holds the alphabet in columns:
+
+      +---+---+---+---+---+
+      | a | f | l | q | v |
+      +---+---+---+---+---+
+      | b | g | m | r | w |
+      +---+---+---+---+---+
+      | c | h | n | s | x |
+      +---+---+---+---+---+
+      | d | i | o | t | y |
+      +---+---+---+---+---+
+      | e | k | p | u | z |
+      +---+---+---+---+---+
+
+   The second uses the key as a keyword in the usual way (see
+   :class:`goldbug.util.Polybius`). In English, the key in our example is
+   **one thousand three hundred twenty five**, so the second square is this:
+
+      +---+---+---+---+---+
+      | o | n | e | t | h |
+      +---+---+---+---+---+
+      | u | s | a | d | r |
+      +---+---+---+---+---+
+      | w | y | f | i | v |
+      +---+---+---+---+---+
+      | b | c | g | k | l |
+      +---+---+---+---+---+
+      | m | p | q | x | z |
+      +---+---+---+---+---+
+
+   Each plaintext character is looked up in the first square and replaced with
+   the character in the same position in the second. Decryption is the same
+   process with the squares reversed.
+
+   :param key: an integer.
+   :param alphabet: an alphabet containing at least all the letters used to
+                    spell out the key, and having a length with an integral
+                    square root.
+   :param numberword: a function that converts integers into strings; by
+                      default, :func:`goldbug.util.numberword`.
+
 .. class:: Bifid(key, period=0)
 
    The bifid cipher was invented around 1901 by Félix Delastelle, and was

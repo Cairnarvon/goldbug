@@ -939,6 +939,105 @@ class RailFence(Cipher):
 
 # Other ciphers
 
+class Bazeries(Cipher):
+    """
+    The Bazeries cipher (not to be confused with the Bazeries cylinder) was
+    designed by French military cryptanalyst Etienne Bazeries. It combines
+    transposition and substitution.
+
+    The key is an integer, which is used in two ways.
+
+    First, it is used to permute the input text. If the key is, for example,
+    1325, the plaintext is divided into segments of lengths 1, 3, 2, and 5,
+    and each segment is reversed, as follows (if our plaintext is
+    SAMPLEPLAINTEXT):
+
+        S  A M P  L E  P L A I N  T  E X T
+        S  P M A  E L  N I A L P  T  T X E
+
+    For the substitution step, two Polybius squares are used. The first just
+    holds the alphabet in columns:
+
+        A F L Q V
+        B G M R W
+        C H N S X
+        D I O T Y
+        E K P U Z
+
+    The second uses the key as a keyword in the usual way. In English, the
+    key in our example is ONE THOUSAND THREE HUNDRED TWENTY FIVE, so the
+    second square is:
+
+        O N E T H
+        U S A D R
+        W Y F I V
+        B C G K L
+        M P Q X Z
+
+    Each plaintext character is looked up in the first square and replaced
+    with the character in the same position in the other square.
+    """
+    def __init__(self, key, alphabet='abcdefghiklmnopqrstuvwxyz',
+                 numberword=util.numberword):
+        """
+        key is a number.
+        alphabet must have a length with an integral square root and contain
+        all the letters used to form English numbers.
+        numberword is a function that transforms numbers into words; by
+        default, goldbug.util.numberword
+        """
+        self.key = int(key)
+        self.alphabet = alphabet
+
+        # Plaintext Polybius square
+        row = int(len(alphabet) ** .5)
+        cols = (alphabet[i:i + row] for i in range(0, len(alphabet), row))
+        self.plain = util.Polybius('', ''.join(''.join(r) for r in zip(*cols)))
+
+        # Ciphertext Polybius square
+        self.numberword = numberword
+        self.cipher = util.Polybius(numberword(self.key), alphabet)
+
+    def encrypt(self, text):
+        """
+        Transforms plaintext into ciphertext.
+        """
+        return type(text)('').join(self.cipher[self.plain[c]] for c
+                                   in self.__transpose(text))
+
+    def decrypt(self, text):
+        """
+        Transforms ciphertext into plaintext.
+        """
+        return type(text)('').join(self.plain[self.cipher[c]] for c
+                                   in self.__transpose(text))
+
+    def __transpose(self, text):
+        # 1234 => [1, 2, 3, 4]
+        digits = []
+        key = self.key
+        while key:
+            key, d = divmod(key, 10)
+            digits.append(d)
+        digits.reverse()
+
+        # Slice up the text and reverse each slice, yielding each character.
+        i = 0
+        for d in itertools.cycle(digits):
+            for c in reversed(text[i:i + d]):
+                yield c
+            i += d
+            if i >= len(text):
+                return
+
+    def __repr__(self):
+        args = ['%r' % self.key]
+        if self.alphabet != 'abcdefghiklmnopqrstuvwxyz':
+            args.append('alphabet=%r' % self.alphabet)
+        if self.numberword != util.numberword:
+            args.append('numberword=%r' % self.numberword)
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(args))
+
 class Bifid(Cipher):
     """
     The bifid cipher, invented around 1901 by Felix Delastelle, combines
