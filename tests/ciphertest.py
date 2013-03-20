@@ -806,6 +806,33 @@ class BifidTest(unittest.TestCase):
         cipher = goldbug.cipher.Bifid('bgwkzqpndsioaxefclumthyvr', 3)
         self.assertEqual(repr(cipher), "Bifid('bgwkzqpndsioaxefclumthyvr', 3)")
 
+class FractionatedMorseTest(unittest.TestCase):
+    def test_fractionatedmorse_encrypt(self):
+        cipher = goldbug.cipher.FractionatedMorse('morsecode')
+        self.assertEqual(cipher.encrypt('attack tonight'), 'cntvhgzwndahma')
+
+    def test_fractionatedmorse_decrypt(self):
+        cipher = goldbug.cipher.FractionatedMorse('morsecode')
+        self.assertEqual(cipher.decrypt('cntvhgzwndahma'), 'attack tonight')
+
+    def test_fractionatedmorse_bad(self):
+        self.assertRaises(ValueError, goldbug.cipher.FractionatedMorse,
+                          'bad.key')
+        self.assertRaises(KeyError,
+                          goldbug.cipher.FractionatedMorse('test').decrypt,
+                          'bad.ciphertext')
+
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_fractionatedmorse_unicode(self):
+        cipher = goldbug.cipher.FractionatedMorse('test')
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
+
+    def test_fractionatedmorse_misc(self):
+        self.assertEqual(repr(goldbug.cipher.FractionatedMorse('test')),
+                         "FractionatedMorse('test')")
+
 class TrifidTest(unittest.TestCase):
     def test_trifid_encrypt(self):
         cipher = goldbug.cipher.Trifid('epsducvwym.zlkxnbtfgorijhaq', 5)

@@ -1144,6 +1144,120 @@ class Bifid(Cipher):
         else:
             return '%s(%r)' % (self.__class__.__name__, self.polybius.contents)
 
+class FractionatedMorse(Cipher):
+    """
+    The fractionated Morse cipher works by encoding the plaintext using Morse
+    code and marking letter boundaries with X and word boundaries with XX. For
+    example, if our plaintext is "sample plain":
+
+        S   A  M  P    L    E  P    L    A  I  N
+        ...X.-X--X.--.X.-..X.XX.--.X.-..X.-X..X-.
+
+    This code is then divided into trigraphs (padding with X if necessary), and
+    these trigraphs are translated using a keyed alphabet. If our key is
+    "secret", our alphabet becomes "secrtabdfghijklmnopquvwxyz", and our
+    translation table is the following:
+
+        ...  ->  s
+        ..-  ->  e
+        ..X  ->  c
+        .-.  ->  r
+        .--  ->  t
+        .-X  ->  a
+        .X.  ->  b
+        .X-  ->  d
+        etc.
+
+    The translation step:
+
+        ...  s
+        X.-  q
+        X--  w
+        X.-  q
+        -.X  i
+        .-.  r
+        .X.  b
+        XX.  y
+        --.  j
+        X.-  q
+        ..X  c
+        .-X  a
+        ..X  c
+        -.X  i
+
+    Our ciphertext is "sqwqirbyjqcaci". Decryption is the same process in
+    reverse.
+    """
+    morse = {'a': '.-',     'b': '-...',    'c': '-.-.',    'd': '-..',
+             'e': '.',      'f': '..-.',    'g': '--.',     'h': '....',
+             'i': '..',     'j': '.---',    'k': '-.-',     'l': '.-..',
+             'm': '--',     'n': '-.',      'o': '---',     'p': '.--.',
+             'q': '--.-',   'r': '.-.',     's': '...',     't': '-',
+             'u': '..-',    'v': '...-',    'w': '.--',     'x': '-..-',
+             'y': '-.--',   'z': '--..',
+             '.': '.-.-.-', ',': '--..--',  ':': '---...',  '"': '.-..-.',
+             "'": '.----.', '!': '-.-.--',  '?': '..--..',  '@': '.--.-.',
+             '-': '-....-', ';': '-.-.-.',  '(': '-.--.',  ')': '-.--.-',
+             '=': '-...-',  '/': '-..-.',
+             '1': '.----',  '2': '..---',   '3': '...--',   '4': '....-',
+             '5': '.....',  '6': '-....',   '7': '--...',   '8': '---..',
+             '9': '----.',  '0': '-----',
+             ' ': ''}
+    unmorse = dict((val, key) for key, val in morse.items())
+
+    def __init__(self, key):
+        """
+        key is an alphabetic string.
+        """
+        trigraphs = ('...', '..-', '..X',
+                     '.-.', '.--', '.-X',
+                     '.X.', '.X-', '.XX',
+                     '-..', '-.-', '-.X',
+                     '--.', '---', '--X',
+                     '-X.', '-X-', '-XX',
+                     'X..', 'X.-', 'X.X',
+                     'X-.', 'X--', 'X-X',
+                     'XX.', 'XX-') # XXX is not possible.
+
+        self.key = key.lower()
+        keybet = []
+        for i in key + string.ascii_lowercase:
+            if i not in keybet:
+                keybet.append(i)
+        if len(keybet) != 26:
+            raise ValueError('Invalid key!')
+
+        self._encmap = dict(zip(trigraphs, keybet))
+        self._decmap = dict(zip(keybet, trigraphs))
+
+    def encrypt(self, text):
+        """
+        Transforms plaintext into ciphertext.
+        """
+        # Encode plaintext in Morse.
+        code, lastchar = [], None
+        for c in text.lower().rstrip(' '):
+            if c == ' ' and lastchar == ' ':
+                # Collapse runs of spaces to avoid XXX.
+                continue
+            if c in self.morse:
+                code.append(self.morse[c])
+                lastchar = c
+
+        # Separate letters/symbols with X and words with XX (because space maps
+        # to '' in our Morse table).
+        code = 'X'.join(code) + 'XX'
+
+        return type(text)('').join(self._encmap[code[i:i + 3]]
+                                   for i in range(0, len(code) - 2, 3))
+
+    def decrypt(self, text):
+        """
+        Transforms ciphertext into plaintext.
+        """
+        code = ''.join(self._decmap[c] for c in text)
+        return type(text)('').join(self.unmorse[c] for c in code.split('X'))
+
 class Trifid(Bifid):
     """
     The trifid cipher is another cipher by Felix Delastelle. It extends the

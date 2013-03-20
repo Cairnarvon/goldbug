@@ -661,6 +661,55 @@ exotic going on that makes them difficult to classify.
    :param period: an integer; if non-positive, text will be encrypted and
                   decrypted whole.
 
+.. class:: FractionatedMorse(key)
+
+   The fractionated Morse cipher works by encoding the plaintext using Morse
+   code and marking letter boundaries with X and word boundaries with XX. The
+   resulting code is divided into trigraphs (padding with X if necessary), and
+   those trigraphs are translated into alphabetic characters using a keyed
+   alphabet.
+
+   For example, using the plaintext ``attack tonight`` and the key ``secret``,
+   this works as follows. First, the encoding step:
+
+   +--------+-------+-------+-------+-------+-------+--------+-------+----------+-------+---------+--------+-------+-------+---------+-------+--------+-------+--------+-------+---------+-------+----------+-------+-------+
+   | A      |       | T     |       | T     |       | A      |       | C        |       | K       |        | T     |       | O       |       | N      |       | I      |       | G       |       | H        |       | T     |
+   +========+=======+=======+=======+=======+=======+========+=======+==========+=======+=========+========+=======+=======+=========+=======+========+=======+========+=======+=========+=======+==========+=======+=======+
+   | ``.-`` | ``X`` | ``-`` | ``X`` | ``-`` | ``X`` | ``.-`` | ``X`` | ``-.-.`` | ``X`` | ``-.-`` | ``XX`` | ``-`` | ``X`` | ``---`` | ``X`` | ``-.`` | ``X`` | ``..`` | ``X`` | ``--.`` | ``X`` | ``....`` | ``X`` | ``-`` |
+   +--------+-------+-------+-------+-------+-------+--------+-------+----------+-------+---------+--------+-------+-------+---------+-------+--------+-------+--------+-------+---------+-------+----------+-------+-------+
+
+   Since our key is ``secret``, our keyed alphabet is
+   ``secrtabdfghijklmnopquvwxyz``. Matching this up with all possible trigraphs
+   (not including ``XXX``, which should never occur), we get the following
+   table:
+
+   +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
+   | s       | e       | c       | r       | t       | a       | b       | d       | f       | g       | h       | i       | j       | k       | l       | m       | n       | o       | p       | q       | u       | v       | w       | x       | y       | z       |
+   +=========+=========+=========+=========+=========+=========+=========+=========+=========+=========+=========+=========+=========+=========+=========+=========+=========+=========+=========+=========+=========+=========+=========+=========+=========+=========+
+   | ``...`` | ``..-`` | ``..X`` | ``.-.`` | ``.--`` | ``.-X`` | ``.X.`` | ``.X-`` | ``.XX`` | ``-..`` | ``-.-`` | ``-.X`` | ``--.`` | ``---`` | ``--X`` | ``-X.`` | ``-X-`` | ``-XX`` | ``X..`` | ``X.-`` | ``X.X`` | ``X-.`` | ``X--`` | ``X-X`` | ``XX.`` | ``XX-`` |
+   +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
+
+   We use this table to translate our code's trigraphs:
+
+   +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
+   | ``.-X`` | ``-X-`` | ``X.-`` | ``X-.`` | ``-.X`` | ``-.-`` | ``XX-`` | ``X--`` | ``-X-`` | ``.X.`` | ``.X-`` | ``-.X`` | ``...`` | ``.X-`` |
+   +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
+   | **a**   | **n**   | **q**   | **v**   | **i**   | **h**   | **z**   | **w**   | **n**   | **b**   | **d**   | **i**   | **s**   | **d**   |
+   +---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+---------+
+
+   And our ciphertext is ``anqvihzwnbdisd``. Decryption is the same process in
+   reverse.
+
+   This implementation provides the basic Latin alphabet, the ten Arabic
+   numerals, and a number of punctuation characters, as specified in
+   `ITU-R M.1677-1`_. For the exact mapping, see
+   :attr:`FractionatedMorse.morse`. Plaintext characters not in the dictionary
+   are silently dropped.
+
+   .. _`ITU-R M.1677-1`: http://www.itu.int/rec/R-REC-M.1677-1-200910-I/
+
+   :param key: an alphabetic string.
+
 .. class:: Trifid(key, period=0)
 
    The trifid cipher is another cipher by Félix Delastelle. It extends the
