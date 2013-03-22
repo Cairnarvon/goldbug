@@ -3,7 +3,7 @@ Exercises
 
 Because you have too much free time. All of these problems are soluble using
 :mod:`goldbug`, and shouldn't require more than intermediate programming
-experience. Problems are listed from easiest to hardest.
+experience.
 
 
 Problems
@@ -62,9 +62,10 @@ The Gold-Bug
       'eweshaileaseolremtreodenptbeituaroweseocaxemtrottretsoyvhnptrahlngitsuosenienptrefaddehtvsnfceyhaingshnlaoccapetreuloiintfemnieoboubatrgitactreseaholroideaitreekahtaidnsmesnptraidhoimtreasigyfeshoseailseohaidewesuueosaoyintohnlaocahtinsoioioslrahtfgtamnfecaewetrottrernfnnptrahlngitsuahintdettaidohjgosemeoc'
 
    It's clear not every character is mapped correctly, but it's a good starting
-   point. From here, you could manually try to figure out which mappings are
-   wrong, or randomly swap some lower-frequency characters to see what happens.
-   The decrypted message is this::
+   point. From here, you can apply a heuristic search algorithm using
+   :func:`goldbug.analysis.chi2` with longer N-grams, swapping two characters in
+   the substitution alphabet until the statistic for your tentative plaintext
+   won't go any lower. The decrypted message is this::
 
       eversinceireachedtheageoftwentyihaverealized
       thatthetrampsofthiscountryareoneofthebiggest
