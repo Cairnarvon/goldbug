@@ -450,6 +450,42 @@ class PlayfairTest(unittest.TestCase):
             "Playfair('a', breaker='a', padding='a', omitted={'q': ''})"
         )
 
+class RagbabyTest(unittest.TestCase):
+    def test_ragbaby_encryption(self):
+        cipher = goldbug.cipher.Ragbaby('cipher')
+        self.assertEqual(cipher.encrypt('This is an example.  Example!'),
+                         'Urew pu bq rzfsbtj.  Rzfsbtj!')
+
+    def test_ragbaby_decrypt(self):
+        cipher = goldbug.cipher.Ragbaby('cipher')
+        self.assertEqual(cipher.decrypt('Urew pu bq rzfsbtj.  Rzfsbtj!'),
+                         'This is an example.  Example!')
+
+    def test_ragbaby_bad(self):
+        self.assertRaises(ValueError, goldbug.cipher.Ragbaby, '!')
+        self.assertRaises(ValueError, goldbug.cipher.Ragbaby, '', 'aabc')
+
+    def test_ragbaby_invariant(self):
+        cipher = goldbug.cipher.Ragbaby('', '')
+        self.assertEqual(cipher.encrypt('test a test'), 'test a test')
+        self.assertEqual(cipher.decrypt('test a test'), 'test a test')
+        cipher = goldbug.cipher.Ragbaby('', 'a')
+        self.assertEqual(cipher.encrypt('test a test'), 'test a test')
+        self.assertEqual(cipher.decrypt('test a test'), 'test a test')
+
+    @unittest.skipIf(sys.version_info[0] > 2, 'No string in Python 3')
+    def test_unicode(self):
+        cipher = goldbug.cipher.Ragbaby('testing')
+        self.assertEqual(type(cipher.encrypt('something')), type('something'))
+        self.assertEqual(type(cipher.encrypt('something'.decode('utf8'))),
+                         type('something'.decode('utf8')))
+
+    def test_ragbaby_misc(self):
+        self.assertEqual(repr(goldbug.cipher.Ragbaby('test')),
+                         "Ragbaby('test')")
+        self.assertEqual(repr(goldbug.cipher.Ragbaby('test', 'abctes')),
+                         "Ragbaby('test', alphabet='abctes')")
+
 class Rot13Test(unittest.TestCase):
     def test_rot13_encryption(self):
         cipher = goldbug.cipher.Rot13()

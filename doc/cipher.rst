@@ -354,6 +354,42 @@ a **simple** substitution cipher; if it operates on groups of characters, it is
    :param padding: a single letter.
    :param omitted: a :class:`dict` mapping a letter to a letter or :const:`''`.
 
+.. class:: Ragbaby(key, alphabet='abcdefghijklmnopqrstuvwxyz')
+
+   The ragbaby cipher is a substitution cipher that enciphers plaintext
+   characters using a keyed alphabet and their position in the plaintext word
+   they're a part of.
+
+   To encrypt the plaintext ``This is an example.`` with the key ``cipher``,
+   first construct a keyed alphabet in the usual way:
+
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+      | c | i | p | h | e | r | a | b | d | f | g | j | k | l | m | n | o | q | s | t | u | v | w | x | y | z |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+   Then, number the letters in the plaintext as follows:
+
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+      | T | h | i | s |   | i | s |   | a | n |   | e | x | a | m | p | l | e | . |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+      | 1 | 2 | 3 | 4 |   | 1 | 2 |   | 1 | 2 |   | 1 | 2 | 3 | 4 | 5 | 6 | 7 |   |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+   To obtain the ciphertext, replace each character of the plaintext with the
+   letter in the keyed alphabet the corresponding number of places to the right
+   of it (wrapping if necessary). Non-alphabetic characters are preserved to
+   mark word boundaries; otherwise, decryption (the same process, except to the
+   left instead of the right) would be unfeasible.
+
+   Our ciphertext is then ``Urew pu bq rzfsbtj.``.
+
+   The traditional ragbaby cipher uses a 24-character alphabet, merging I/J and
+   W/X, but there's no real reason for that and this implementation defaults to
+   the 26 usual letters.
+
+   :param key: a string containing only characters in the alphabet.
+   :param alphabet: a string containing no duplicate characters.
+
 .. class:: Rot13()
 
    ROT13 is a special case of the :class:`Caesar` cipher. In effect, it is the

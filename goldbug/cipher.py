@@ -569,6 +569,94 @@ class Playfair(MonoalphabeticSubstitutionCipher):
                (self.__class__.__name__, self.key, self.breaker, self.padding,
                 self.omitted)
 
+class Ragbaby(Cipher):
+    """
+    The ragbaby cipher is a substitution cipher that enciphers plaintext
+    characters using a keyed alphabet and their position in the plaintext word
+    they're a part of.
+
+    To encrypt the plaintext "this is an example." with the key "cipher", first
+    construct a keyed alphabet in the usual way:
+
+        c i p h e r a b d f g j k l m n o q s t u v w x y z
+
+    Then, number the letters in the plaintext as follows:
+
+        t h i s   i s   a n   e x a m p l e .
+        1 2 3 4   1 2   1 2   1 2 3 4 5 6 7
+
+    To obtain the ciphertext, replace each character of the plaintext with the
+    letter in the keyed alphabet the corresponding number of places to the right
+    of it (wrapping if necessary):
+
+        urew pu bq rzfsbtj.
+
+    Non-alphabetic characters are preserved to mark word boundaries; otherwise,
+    decryption (the same process, except to the left instead of the right) would
+    be unfeasible.
+
+    The traditional ragbaby cipher uses a 24-character alphabet, merging I/J and
+    W/X, but there's no real reason for that and this implementation defaults to
+    the 26 usual letters.
+    """
+    def __init__(self, key, alphabet=string.ascii_lowercase):
+        """
+        key is a string.
+        """
+        self.alphabet = alphabet
+        if len(set(alphabet)) != len(alphabet):
+            raise ValueError('Alphabet contains duplicates!')
+
+        self.key = key
+        self._key = []
+        for c in key + alphabet:
+            if c not in alphabet:
+                raise ValueError('Key contains invalid characters!')
+            if c not in self._key:
+                self._key.append(c.lower())
+
+    def encrypt(self, text):
+        """
+        Transforms plaintext into ciphertext.
+        """
+        n = 1
+        cipher = []
+        for c in text:
+            try:
+                i = (self._key.index(c.lower()) + n) % len(self._key)
+                cipher.append(self._key[i] if c.islower()
+                              else self._key[i].upper())
+                n += 1
+            except ValueError:
+                # Word boundary.
+                cipher.append(c)
+                n = 1
+        return type(text)('').join(cipher)
+
+    def decrypt(self, text):
+        """
+        Transforms plaintext into ciphertext.
+        """
+        n = 1
+        plain = []
+        for c in text:
+            try:
+                i = (self._key.index(c.lower()) - n) % len(self._key)
+                plain.append(self._key[i] if c.islower()
+                             else self._key[i].upper())
+                n += 1
+            except ValueError:
+                # Word boundary.
+                plain.append(c)
+                n = 1
+        return type(text)('').join(plain)
+
+    def __repr__(self):
+        args = [repr(self.key)]
+        if self.alphabet != string.ascii_lowercase:
+            args.append('alphabet=%r' % self.alphabet)
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(args))
+
 class Rot13(Caesar):
     """
     ROT13 is a special case of the Caesar cipher. In effect, it is the Caesar
