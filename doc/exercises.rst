@@ -1,3 +1,5 @@
+.. role:: hint
+
 Exercises
 =========
 
@@ -53,7 +55,7 @@ The following ciphertext has been encrypted with the Vigenère cipher::
 
 Knowing that the text is in English, answer the following questions:
 
-1. How long is the key?
+1. How long is the key? :hint:`Use N-gram statistics and exhaustive checking.`
 2. What is the plaintext?
 
 

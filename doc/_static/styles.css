@@ -1,0 +1,13 @@
+.hint {
+    color: white;
+    background-color: white;
+    border-bottom: 1px solid #ccc;
+}
+.hint:hover {
+    color: inherit;
+    background-color: inherit;
+}
+.hint:before {
+    content: 'Hint: ';
+    color: black;
+}
